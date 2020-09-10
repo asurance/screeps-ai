@@ -99,9 +99,10 @@ __webpack_require__.r(__webpack_exports__);
 function main() {
     console.log('hello world');
 }
+Game.creeps.a.memory;
 
 
 /***/ })
 
 /******/ });
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=main.js.map

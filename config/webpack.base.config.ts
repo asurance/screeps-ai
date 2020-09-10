@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { Configuration } from 'webpack'
 
 const config = {
+    target: 'node',
     entry: resolve(__dirname, '../src/index.ts'),
     module: {
         rules: [
