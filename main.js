@@ -110,7 +110,7 @@ for (const creepName in Game.creeps) {
 }
 for (const spawnName in Game.spawns) {
     const spawn = Game.spawns[spawnName];
-    if (!spawn.spawning) {
+    if (!spawn.spawning && spawn.store.getFreeCapacity('energy') >= 100) {
         const name = `worker_${count}`;
         const result = spawn.spawnCreep(['work', 'move'], `worker_${count}`);
         if (result === OK) {
