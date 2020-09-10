@@ -1,5 +1,6 @@
+import { Walker } from './walker'
+
 let count = 0
-let hasWalker = false
 for (const creepName in Game.creeps) {
     const creep = Game.creeps[creepName]
     if (creep.memory.type === 'worker') {
@@ -10,26 +11,15 @@ for (const creepName in Game.creeps) {
             }
         }
         count++
-    } else if (creep.memory.type === 'walker') {
-        hasWalker = true
-        const result = creep.room.lookAtArea(
-            Math.max(0, creep.pos.y - 1),
-            Math.max(0, creep.pos.x - 1),
-            Math.min(49, creep.pos.y + 1),
-            Math.min(49, creep.pos.x + 1), true)
-            .filter(r => {
-                return r.terrain !== 'wall'
-            })
-        if (result.length > 0) {
-            const next = Math.floor(Math.random() * result.length)
-            creep.moveTo(result[next].x, result[next].y)
-        }
+    } else if (creep.memory.type === Walker.type) {
+        Walker.count++
+        Walker.tick(creep, creep.room)
     }
 }
 for (const spawnName in Game.spawns) {
     const spawn = Game.spawns[spawnName]
     if (!spawn.spawning && spawn.store['energy'] >= 200) {
-        if (hasWalker) {
+        if (Walker.count > 0) {
             const name = `worker_${count}`
             const result = spawn.spawnCreep(['work', 'move'], `worker_${count}`)
             if (result === OK) {
@@ -38,11 +28,8 @@ for (const spawnName in Game.spawns) {
                 console.log(result)
             }
         } else {
-            const name = 'walker'
-            const result = spawn.spawnCreep(['move'], 'walker')
-            if (result === OK) {
-                Memory.creeps[name].type = 'walker'
-            } else {
+            const result = Walker.create(spawn, spawn.room)
+            if (result !== OK) {
                 console.log(result)
             }
         }
