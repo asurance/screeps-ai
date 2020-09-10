@@ -90,16 +90,25 @@
 /*!**********************!*\
   !*** ./src/index.ts ***!
   \**********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return main; });
-function main() {
-    console.log('hello world');
+
+for (const spawnName in Game.spawns) {
+    const spawn = Game.spawns[spawnName];
+    if (!spawn.spawning) {
+        console.log(spawn.name);
+        const result = spawn.spawnCreep(['carry', 'move'], 'worker');
+        if (result !== 0) {
+            console.log(result);
+        }
+    }
 }
-Game.creeps.a.memory;
+for (const creepName in Game.creeps) {
+    const creep = Game.creeps[creepName];
+    creep.moveTo(Math.random() < 0.5 ? 1 : -1, Math.random() < 0.5 ? 1 : -1);
+}
 
 
 /***/ })
