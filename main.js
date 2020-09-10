@@ -90,13 +90,14 @@
 /*!**********************!*\
   !*** ./src/index.ts ***!
   \**********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _walker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./walker */ "./src/walker.ts");
 
 let count = 0;
-let hasWalker = false;
 for (const creepName in Game.creeps) {
     const creep = Game.creeps[creepName];
     if (creep.memory.type === 'worker') {
@@ -108,22 +109,15 @@ for (const creepName in Game.creeps) {
         }
         count++;
     }
-    else if (creep.memory.type === 'walker') {
-        hasWalker = true;
-        const result = creep.room.lookAtArea(Math.max(0, creep.pos.y - 1), Math.max(0, creep.pos.x - 1), Math.min(49, creep.pos.y + 1), Math.min(49, creep.pos.x + 1), true)
-            .filter(r => {
-            return r.terrain !== 'wall';
-        });
-        if (result.length > 0) {
-            const next = Math.floor(Math.random() * result.length);
-            creep.moveTo(result[next].x, result[next].y);
-        }
+    else if (creep.memory.type === _walker__WEBPACK_IMPORTED_MODULE_0__["Walker"].type) {
+        _walker__WEBPACK_IMPORTED_MODULE_0__["Walker"].count++;
+        _walker__WEBPACK_IMPORTED_MODULE_0__["Walker"].tick(creep, creep.room);
     }
 }
 for (const spawnName in Game.spawns) {
     const spawn = Game.spawns[spawnName];
     if (!spawn.spawning && spawn.store['energy'] >= 200) {
-        if (hasWalker) {
+        if (_walker__WEBPACK_IMPORTED_MODULE_0__["Walker"].count > 0) {
             const name = `worker_${count}`;
             const result = spawn.spawnCreep(['work', 'move'], `worker_${count}`);
             if (result === OK) {
@@ -134,15 +128,100 @@ for (const spawnName in Game.spawns) {
             }
         }
         else {
-            const name = 'walker';
-            const result = spawn.spawnCreep(['move'], 'walker');
-            if (result === OK) {
-                Memory.creeps[name].type = 'walker';
-            }
-            else {
+            const result = _walker__WEBPACK_IMPORTED_MODULE_0__["Walker"].create(spawn, spawn.room);
+            if (result !== OK) {
                 console.log(result);
             }
         }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/walker.ts":
+/*!***********************!*\
+  !*** ./src/walker.ts ***!
+  \***********************/
+/*! exports provided: Walker */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Walker", function() { return Walker; });
+const Walker = {
+    count: 0,
+    type: "Walker" /* Walker */,
+    create(spawn, room) {
+        const result = spawn.spawnCreep(['move'], 'walker');
+        if (result === OK) {
+            Memory.creeps['walker'].type = "Walker" /* Walker */;
+        }
+        Memory.creeps['walker'].direction = getNextDirection(spawn.pos, room);
+        return result;
+    },
+    tick(creep, room) {
+        let direction;
+        if (canMove(creep.pos, creep.memory.direction, room)) {
+            direction = creep.memory.direction;
+        }
+        else {
+            direction = getNextDirection(creep.pos, room);
+            creep.memory.direction = direction;
+        }
+        creep.move(direction);
+    }
+};
+function canMove(pos, dir, room) {
+    let dx = 0;
+    let dy = 0;
+    switch (dir) {
+        case LEFT:
+        case TOP_LEFT:
+        case BOTTOM_LEFT:
+            dx = -1;
+            break;
+        case RIGHT:
+        case TOP_RIGHT:
+        case BOTTOM_RIGHT:
+            dx = 1;
+            break;
+    }
+    switch (dir) {
+        case TOP:
+        case TOP_LEFT:
+        case TOP_RIGHT:
+            dy = -1;
+            break;
+        case BOTTOM:
+        case BOTTOM_LEFT:
+        case BOTTOM_RIGHT:
+            dy = 1;
+            break;
+    }
+    return validPosition(pos.x + dx, pos.y + dy, room);
+}
+function getNextDirection(pos, room) {
+    const dx = [0, 1, 1, 1, 0, -1, -1, -1];
+    const dy = [-1, -1, 0, 1, 1, 1, 0, -1];
+    const indice = [0, 1, 2, 3, 4, 5, 6, 7];
+    const ok = indice.filter(i => {
+        return validPosition(dx[i] + pos.x, dy[i] + pos.y, room);
+    });
+    return (TOP + ok[Math.random() * ok.length]);
+}
+function validPosition(x, y, room) {
+    if (x >= 0 && x < 50 && y >= 0 && y < 50) {
+        const result = room.lookAt(x, y);
+        if (result.every(r => r.terrain !== 'wall')) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
     }
 }
 
