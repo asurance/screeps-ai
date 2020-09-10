@@ -16,7 +16,7 @@ const config = {
         extensions: ['.ts', '.js']
     },
     output: {
-        filename: 'index.js',
+        filename: 'main.js',
         path: resolve(__dirname, '../dist'),
     },
 } as Configuration
