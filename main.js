@@ -95,19 +95,31 @@
 
 "use strict";
 
+let count = 0;
+for (const creepName in Game.creeps) {
+    const creep = Game.creeps[creepName];
+    if (creep.memory.type === 'worker') {
+        const target = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+        if (target) {
+            if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
+                creep.moveTo(target);
+            }
+        }
+        count++;
+    }
+}
 for (const spawnName in Game.spawns) {
     const spawn = Game.spawns[spawnName];
     if (!spawn.spawning) {
-        console.log(spawn.name);
-        const result = spawn.spawnCreep(['carry', 'move'], 'worker');
-        if (result !== 0) {
+        const name = `worker_${count}`;
+        const result = spawn.spawnCreep(['work', 'move'], `worker_${count}`);
+        if (result === OK) {
+            Memory.creeps[name].type = 'worker';
+        }
+        else {
             console.log(result);
         }
     }
-}
-for (const creepName in Game.creeps) {
-    const creep = Game.creeps[creepName];
-    creep.moveTo(Math.random() < 0.5 ? 1 : -1, Math.random() < 0.5 ? 1 : -1);
 }
 
 
