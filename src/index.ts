@@ -15,6 +15,14 @@ const creepCtorMap: { [key in CreepType]: BaseCreepCtor<CreepType> } = {
     carrier: Carrier,
 }
 
+if (!Memory.ctors) {
+    Memory.ctors = {
+        walker: 0,
+        carrier: 0,
+        worker: 0,
+    }
+}
+
 for (const key in creepCtorMap) {
     const ctor = creepCtorMap[key as CreepType]
     ctor.deserialize(Memory.ctors[key as CreepType])
