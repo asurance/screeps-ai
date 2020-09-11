@@ -270,7 +270,9 @@ for (const spawnName in Game.spawns) {
             const result = worker.create(span, span.room.energyAvailable);
             if (result !== OK) {
                 console.log(result);
-                break;
+            }
+            else {
+                continue;
             }
         }
     }
@@ -281,7 +283,9 @@ for (const spawnName in Game.spawns) {
             const result = carrier.create(span, span.room.energyAvailable);
             if (result !== OK) {
                 console.log(result);
-                break;
+            }
+            else {
+                continue;
             }
         }
     }
@@ -292,7 +296,9 @@ for (const spawnName in Game.spawns) {
             const result = walker.create(span, span.room.energyAvailable);
             if (result !== OK) {
                 console.log(result);
-                break;
+            }
+            else {
+                continue;
             }
         }
     }
