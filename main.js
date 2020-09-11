@@ -153,7 +153,7 @@ const Carrier = (_a = class Carrier {
         ticker() {
             const memory = this.creep.memory;
             if (memory.pickup) {
-                if (this.creep.store.getFreeCapacity('energy') > 0) {
+                if (this.creep.store.energy < this.creep.store.getCapacity('energy')) {
                     if (memory.targetId === null) {
                         const target = this.creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
                         if (target) {
@@ -178,7 +178,7 @@ const Carrier = (_a = class Carrier {
                 }
             }
             else {
-                if (this.creep.store.getUsedCapacity('energy') > 0) {
+                if (this.creep.store.energy > 0) {
                     if (memory.targetId === null) {
                         const target = this.creep.pos.findClosestByPath(FIND_MY_SPAWNS);
                         if (target) {
