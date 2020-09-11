@@ -1,18 +1,23 @@
 interface Memory {
-    hasWalker: boolean
+    ctors: { [key in CreepType]: CreepDataMap[key] }
 }
-interface CreepMemory {
-    type: CreepType | string
-    direction: DirectionConstant
+
+interface Creep<T extends MemoryData = MemoryData> {
+    memory: T
+}
+
+interface MemoryData extends CreepMemory {
+    type: CreepType
 }
 
 const enum CreepType {
-    Walker = 'Walker'
+    Worker = 'worker',
+    Carrier = 'carrier',
+    Walker = 'walker',
 }
 
-interface ICreep {
-    count: number
-    readonly type: CreepType
-    create(spawn: StructureSpawn, room: Room): ScreepsReturnCode
-    tick(creep: Creep, room: Room): void
+interface CreepDataMap {
+    [CreepType.Worker]: number
+    [CreepType.Carrier]: number
+    [CreepType.Walker]: number
 }
