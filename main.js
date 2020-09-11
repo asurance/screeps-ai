@@ -237,6 +237,13 @@ const creepCtorMap = {
     walker: _walker__WEBPACK_IMPORTED_MODULE_1__["Walker"],
     carrier: _carrier__WEBPACK_IMPORTED_MODULE_0__["Carrier"],
 };
+if (!Memory.ctors) {
+    Memory.ctors = {
+        walker: 0,
+        carrier: 0,
+        worker: 0,
+    };
+}
 for (const key in creepCtorMap) {
     const ctor = creepCtorMap[key];
     ctor.deserialize(Memory.ctors[key]);
