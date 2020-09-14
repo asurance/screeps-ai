@@ -1,10 +1,7 @@
 import { BaseCreep, BaseCreepCtor } from './baseCreep'
 import { Builder } from './builder'
-import { Carrier } from './carrier'
 import { Harvester } from './harvester'
 import { Upgrader } from './upgrader'
-import { Walker } from './walker'
-import { Worker } from './worker'
 
 for (const key in Memory.creeps) {
     if (!(key in Game.creeps)) {
@@ -13,9 +10,6 @@ for (const key in Memory.creeps) {
 }
 
 const creepCtorMap: { [key in CreepType]: BaseCreepCtor<CreepType> } = {
-    worker: Worker,
-    walker: Walker,
-    carrier: Carrier,
     harvester: Harvester,
     upgrader: Upgrader,
     builder: Builder,
@@ -57,8 +51,8 @@ if (spawning === null) {
                 list.splice(index, 1)
             }
         }
-        spawning = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null
     })
+    spawning = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null
 } else {
     creepMap.forEach(creeps => creeps.forEach(creep => creep.ticker()))
 }
@@ -74,5 +68,12 @@ for (const spawnName in Game.spawns) {
                 console.log(reuslt)
             }
         }
+    }
+}
+
+Game.killAllCreeps = () => {
+    for (const name in Game.creeps) {
+        Game.creeps[name].suicide()
+        delete Memory.creeps[name]
     }
 }

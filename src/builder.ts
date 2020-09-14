@@ -3,6 +3,8 @@ import { BaseCreep, BaseCreepCtor, GetRequiredEnergy } from './baseCreep'
 interface Data extends MemoryData {
     type: CreepType.Builder
     building: boolean
+    targetId: Id<Source> | null
+    buildId: Id<ConstructionSite<BuildableStructureConstant>> | null
 }
 
 export const Builder: BaseCreepCtor<CreepType.Builder> = class Builder implements BaseCreep {
@@ -20,7 +22,9 @@ export const Builder: BaseCreepCtor<CreepType.Builder> = class Builder implement
             this.creep = Game.creeps[name] as Creep<Data>
             this.creep.memory = {
                 type: CreepType.Builder,
-                building: false
+                building: false,
+                targetId: null,
+                buildId: null,
             }
         }
         return result
@@ -39,24 +43,51 @@ export const Builder: BaseCreepCtor<CreepType.Builder> = class Builder implement
         }
 
         if (creep.memory.building) {
-            const targets = creep.room.find(FIND_CONSTRUCTION_SITES)
-            if (targets.length) {
-                if (creep.build(targets[0]) === ERR_NOT_IN_RANGE) {
-                    creep.moveTo(targets[0])
+
+            let target: ConstructionSite<BuildableStructureConstant> | null = null
+            if (this.creep.memory.buildId) {
+                target = Game.getObjectById(this.creep.memory.buildId)
+            }
+            if (target === null) {
+                const source = this.creep.room.find(FIND_CONSTRUCTION_SITES)
+                if (source.length > 0) {
+                    target = source[Math.floor(Math.random() * source.length)]
+                    this.creep.memory.buildId = target.id
                 }
-                creep.say('建造中')
+            }
+            if (target) {
+                if (this.creep.build(target) === ERR_NOT_IN_RANGE) {
+                    this.creep.moveTo(target)
+                }
+                this.creep.say('建造中')
                 return true
             } else {
+                this.creep.say('闲置中')
                 return false
             }
         }
         else {
-            const sources = creep.room.find(FIND_SOURCES)
-            if (creep.harvest(sources[0]) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0])
+            let target: Source | null = null
+            if (this.creep.memory.targetId) {
+                target = Game.getObjectById(this.creep.memory.targetId)
             }
-            creep.say('采矿中')
-            return true
+            if (target === null) {
+                const source = this.creep.room.find(FIND_SOURCES)
+                if (source.length > 0) {
+                    target = source[Math.floor(Math.random() * source.length)]
+                    this.creep.memory.targetId = target.id
+                }
+            }
+            if (target) {
+                if (this.creep.harvest(target) === ERR_NOT_IN_RANGE) {
+                    this.creep.moveTo(target)
+                }
+                this.creep.say('采矿中')
+                return true
+            } else {
+                this.creep.say('闲置中')
+                return false
+            }
         }
     }
 

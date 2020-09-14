@@ -6,10 +6,11 @@ interface MemoryData extends CreepMemory {
     type: CreepType
 }
 
+interface Game {
+    killAllCreeps(): void
+}
+
 const enum CreepType {
-    Worker = 'worker',
-    Carrier = 'carrier',
-    Walker = 'walker',
     Harvester = 'harvester',
     Upgrader = 'upgrader',
     Builder = 'builder',
