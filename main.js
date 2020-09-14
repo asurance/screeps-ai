@@ -131,7 +131,7 @@ var _a;
 
 const Builder = (_a = class Builder {
         create(spawn) {
-            const name = `${Builder.type}-${Game.time}`;
+            const name = `${spawn.name}-${Game.time}`;
             const result = spawn.spawnCreep(['work', 'carry', 'move'], name);
             if (result === OK) {
                 this.creep = Game.creeps[name];
@@ -228,7 +228,7 @@ var _a;
 
 const Harvester = (_a = class Harvester {
         create(spawn) {
-            const name = `${Harvester.type}-${Game.time}`;
+            const name = `${spawn.name}-${Game.time}`;
             const result = spawn.spawnCreep(['work', 'carry', 'move'], name);
             if (result === OK) {
                 this.creep = Game.creeps[name];
@@ -397,7 +397,7 @@ var _a;
 
 const Upgrader = (_a = class Upgrader {
         create(spawn) {
-            const name = `${Upgrader.type}-${Game.time}`;
+            const name = `${spawn.name}-${Game.time}`;
             const result = spawn.spawnCreep(['work', 'carry', 'move'], name);
             if (result === OK) {
                 this.creep = Game.creeps[name];
