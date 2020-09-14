@@ -1,7 +1,9 @@
-import { BaseCreep, BaseCreepCtor } from './baseCreep'
-import { Builder } from './builder'
-import { Harvester } from './harvester'
-import { Upgrader } from './upgrader'
+import { CreepController } from './baseCreep'
+import { HarvesterController } from './harvesterController'
+import { UpgraderController } from './upgraderController'
+import { BuilderController } from './builderController'
+import { RandomObjectInList } from './util'
+import './patch'
 
 for (const key in Memory.creeps) {
     if (!(key in Game.creeps)) {
@@ -9,41 +11,46 @@ for (const key in Memory.creeps) {
     }
 }
 
-const creepCtorMap: { [key in CreepType]: BaseCreepCtor<CreepType> } = {
-    harvester: Harvester,
-    upgrader: Upgrader,
-    builder: Builder,
+const creepControllerMap: { [key in CreepType]: CreepController<CreepType> } = {
+    harvester: HarvesterController,
+    upgrader: UpgraderController,
+    builder: BuilderController,
 }
 
-const creepMap = new Map<CreepType, BaseCreep[]>()
+const creepMap = new Map<CreepType, Creep[]>()
 
 for (const creepName in Game.creeps) {
     const creep = Game.creeps[creepName] as Creep<MemoryData>
-    const type = creep.memory.type
-    const handler = new creepCtorMap[type]()
-    handler.creep = creep
-    if (creepMap.has(type)) {
-        creepMap.get(type)!.push(handler)
+    const list = creepMap.get(creep.memory.type)
+    if (list) {
+        list.push(creep)
     } else {
-        creepMap.set(type, [handler])
+        creepMap.set(creep.memory.type, [creep])
     }
 }
 
 let spawning: CreepType | null = null
 
+const spawn = Game.spawns['Home']
+
 const list = [CreepType.Harvester, CreepType.Upgrader, CreepType.Builder]
 for (let i = 0; i < list.length; i++) {
     const l = creepMap.get(list[i])
-    if (!l) {
+    if (l) {
+        if (l.length >= 5) {
+            list.splice(i, 1)
+            i--
+        }
+    } else {
         spawning = list[i]
         break
     }
 }
-if (spawning === null) {
+if (spawning === null && list.length > 0) {
     creepMap.forEach((creeps, type) => {
         let flag = true
         for (let i = 0; i < creeps.length; i++) {
-            flag = creeps[i].ticker() && flag
+            flag = creepControllerMap[creeps[i].memory.type].ticker(creeps[i]) && flag
         }
         if (!flag) {
             const index = list.indexOf(type)
@@ -52,28 +59,20 @@ if (spawning === null) {
             }
         }
     })
-    spawning = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null
+    spawning = RandomObjectInList(list)
 } else {
-    creepMap.forEach(creeps => creeps.forEach(creep => creep.ticker()))
+    creepMap.forEach(creeps => creeps.forEach(creep => creepControllerMap[creep.memory.type].ticker(creep)))
 }
 
-for (const spawnName in Game.spawns) {
-    const spawn = Game.spawns[spawnName]
-    if (spawning !== null) {
-        const ctor = creepCtorMap[spawning]
-        if (spawn.room.energyAvailable >= ctor.minEnergy) {
-            const creep = new ctor()
-            const reuslt = creep.create(spawn, spawn.room.energyAvailable)
-            if (reuslt !== OK) {
-                console.log(reuslt)
-            }
+if (spawning !== null) {
+    const controller = creepControllerMap[spawning]
+    if (spawn.room.energyAvailable >= controller.minEnergy) {
+        const name = `${spawn.name}-${Game.time}`
+        const result = controller.create(spawn, name, spawn.room.energyAvailable)
+        if (result === OK) {
+            Game.creeps[name].memory.type = controller.type
+        } else {
+            Game.notify(`spawn object fail:${spawning} ${name} ${result}`, 60)
         }
-    }
-}
-
-Game.killAllCreeps = () => {
-    for (const name in Game.creeps) {
-        Game.creeps[name].suicide()
-        delete Memory.creeps[name]
     }
 }

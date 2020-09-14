@@ -2,8 +2,8 @@ interface Creep<T extends MemoryData = MemoryData> {
     memory: T
 }
 
-interface MemoryData extends CreepMemory {
-    type: CreepType
+interface MemoryData<T extends Creeptype = CreepType> extends CreepMemory {
+    type: T
 }
 
 interface Game {

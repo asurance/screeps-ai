@@ -1,16 +1,4 @@
-export interface BaseCreep {
-    creep: Creep
-    create(spawn: StructureSpawn, maxEnergy: number): ScreepsReturnCode
-    ticker(): boolean
-}
-
-export interface BaseCreepCtor<T extends CreepType> {
-    new(...argv: unknown[]): BaseCreep
-    readonly type: T
-    readonly minEnergy: number
-}
-
-export const EnergyMap: { [key in BodyPartConstant]: number } = {
+export const EnergyMap: Readonly<{ [key in BodyPartConstant]: number }> = {
     move: 50,
     work: 100,
     carry: 50,
@@ -25,4 +13,11 @@ export function GetRequiredEnergy(body: BodyPartConstant[]): number {
     return body.reduce((pre, cur) => {
         return pre + EnergyMap[cur]
     }, 0)
+}
+
+export interface CreepController<T extends CreepType = CreepType> {
+    readonly type: T
+    readonly minEnergy: number
+    create(spawn: StructureSpawn, name: string, maxEnergy: number): ScreepsReturnCode
+    ticker(creep: Creep<MemoryData<T>>): boolean
 }
