@@ -116,6 +116,74 @@ function GetRequiredEnergy(body) {
 
 /***/ }),
 
+/***/ "./src/builder.ts":
+/*!************************!*\
+  !*** ./src/builder.ts ***!
+  \************************/
+/*! exports provided: Builder */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Builder", function() { return Builder; });
+/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
+var _a;
+
+const Builder = (_a = class Builder {
+        create(spawn) {
+            const name = `${Builder.type}-${Game.time}`;
+            const result = spawn.spawnCreep(['work', 'carry', 'move'], name);
+            if (result === OK) {
+                this.creep = Game.creeps[name];
+                this.creep.memory = {
+                    type: "builder" /* Builder */,
+                    building: false
+                };
+            }
+            return result;
+        }
+        ticker() {
+            const creep = this.creep;
+            if (creep.memory.building) {
+                if (creep.store[RESOURCE_ENERGY] === 0) {
+                    creep.memory.building = false;
+                }
+            }
+            else {
+                if (creep.store.getFreeCapacity() === 0) {
+                    creep.memory.building = true;
+                }
+            }
+            if (creep.memory.building) {
+                const targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+                if (targets.length) {
+                    if (creep.build(targets[0]) === ERR_NOT_IN_RANGE) {
+                        creep.moveTo(targets[0]);
+                    }
+                    creep.say('建造中');
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                const sources = creep.room.find(FIND_SOURCES);
+                if (creep.harvest(sources[0]) === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(sources[0]);
+                }
+                creep.say('采矿中');
+                return true;
+            }
+        }
+    },
+    _a.type = "builder" /* Builder */,
+    _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
+    _a);
+
+
+/***/ }),
+
 /***/ "./src/carrier.ts":
 /*!************************!*\
   !*** ./src/carrier.ts ***!
@@ -130,17 +198,10 @@ __webpack_require__.r(__webpack_exports__);
 var _a;
 
 const Carrier = (_a = class Carrier {
-        static serialize() {
-            return this.id;
-        }
-        static deserialize(data) {
-            this.id = data;
-        }
         create(spawn) {
-            const name = `${Carrier.type}-${Carrier.id}`;
-            const result = spawn.spawnCreep(['work', 'move'], `${Carrier.type}-${Carrier.id}`);
+            const name = `${Carrier.type}-${Game.time}`;
+            const result = spawn.spawnCreep(['work', 'move'], name);
             if (result === OK) {
-                Carrier.id++;
                 this.creep = Game.creeps[name];
                 this.creep.memory = {
                     type: "carrier" /* Carrier */,
@@ -202,11 +263,75 @@ const Carrier = (_a = class Carrier {
                     memory.targetId = null;
                 }
             }
+            return true;
         }
     },
-    _a.id = 0,
     _a.type = "carrier" /* Carrier */,
     _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['carry', 'move']),
+    _a);
+
+
+/***/ }),
+
+/***/ "./src/harvester.ts":
+/*!**************************!*\
+  !*** ./src/harvester.ts ***!
+  \**************************/
+/*! exports provided: Harvester */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Harvester", function() { return Harvester; });
+/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
+var _a;
+
+const Harvester = (_a = class Harvester {
+        create(spawn) {
+            const name = `${Harvester.type}-${Game.time}`;
+            const result = spawn.spawnCreep(['work', 'carry', 'move'], name);
+            if (result === OK) {
+                this.creep = Game.creeps[name];
+                this.creep.memory = {
+                    type: "harvester" /* Harvester */,
+                };
+            }
+            return result;
+        }
+        ticker() {
+            if (this.creep.store.getFreeCapacity() > 0) {
+                const source = this.creep.room.find(FIND_SOURCES);
+                if (this.creep.harvest(source[0]) === ERR_NOT_IN_RANGE) {
+                    this.creep.moveTo(source[0]);
+                }
+                this.creep.say('采矿中');
+                return true;
+            }
+            else {
+                const targets = this.creep.room.find(FIND_STRUCTURES, {
+                    filter: (structure) => {
+                        return structure.structureType === STRUCTURE_EXTENSION
+                            || structure.structureType === STRUCTURE_SPAWN
+                            || structure.structureType === STRUCTURE_TOWER
+                                && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                    }
+                });
+                if (targets.length > 0) {
+                    if (this.creep.transfer(targets[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+                        this.creep.moveTo(targets[0]);
+                    }
+                    this.creep.say('运输中');
+                    return true;
+                }
+                else {
+                    this.creep.say('闲置中');
+                    return false;
+                }
+            }
+        }
+    },
+    _a.type = "harvester" /* Harvester */,
+    _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
     _a);
 
 
@@ -221,9 +346,15 @@ const Carrier = (_a = class Carrier {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _carrier__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./carrier */ "./src/carrier.ts");
-/* harmony import */ var _walker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./walker */ "./src/walker.ts");
-/* harmony import */ var _worker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./worker */ "./src/worker.ts");
+/* harmony import */ var _builder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./builder */ "./src/builder.ts");
+/* harmony import */ var _carrier__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./carrier */ "./src/carrier.ts");
+/* harmony import */ var _harvester__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./harvester */ "./src/harvester.ts");
+/* harmony import */ var _upgrader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./upgrader */ "./src/upgrader.ts");
+/* harmony import */ var _walker__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./walker */ "./src/walker.ts");
+/* harmony import */ var _worker__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./worker */ "./src/worker.ts");
+
+
+
 
 
 
@@ -233,21 +364,13 @@ for (const key in Memory.creeps) {
     }
 }
 const creepCtorMap = {
-    worker: _worker__WEBPACK_IMPORTED_MODULE_2__["Worker"],
-    walker: _walker__WEBPACK_IMPORTED_MODULE_1__["Walker"],
-    carrier: _carrier__WEBPACK_IMPORTED_MODULE_0__["Carrier"],
+    worker: _worker__WEBPACK_IMPORTED_MODULE_5__["Worker"],
+    walker: _walker__WEBPACK_IMPORTED_MODULE_4__["Walker"],
+    carrier: _carrier__WEBPACK_IMPORTED_MODULE_1__["Carrier"],
+    harvester: _harvester__WEBPACK_IMPORTED_MODULE_2__["Harvester"],
+    upgrader: _upgrader__WEBPACK_IMPORTED_MODULE_3__["Upgrader"],
+    builder: _builder__WEBPACK_IMPORTED_MODULE_0__["Builder"],
 };
-if (!Memory.ctors) {
-    Memory.ctors = {
-        walker: 0,
-        carrier: 0,
-        worker: 0,
-    };
-}
-for (const key in creepCtorMap) {
-    const ctor = creepCtorMap[key];
-    ctor.deserialize(Memory.ctors[key]);
-}
 const creepMap = new Map();
 for (const creepName in Game.creeps) {
     const creep = Game.creeps[creepName];
@@ -261,53 +384,106 @@ for (const creepName in Game.creeps) {
         creepMap.set(type, [handler]);
     }
 }
+let spawning = null;
+const list = ["harvester" /* Harvester */, "upgrader" /* Upgrader */, "builder" /* Builder */];
+for (let i = 0; i < list.length; i++) {
+    const l = creepMap.get(list[i]);
+    if (!l) {
+        spawning = list[i];
+        break;
+    }
+}
+if (spawning === null) {
+    creepMap.forEach((creeps, type) => {
+        let flag = true;
+        for (let i = 0; i < creeps.length; i++) {
+            flag = creeps[i].ticker() && flag;
+        }
+        if (!flag) {
+            const index = list.indexOf(type);
+            if (index >= 0) {
+                list.splice(index, 1);
+            }
+        }
+        spawning = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null;
+    });
+}
+else {
+    creepMap.forEach(creeps => creeps.forEach(creep => creep.ticker()));
+}
 for (const spawnName in Game.spawns) {
-    const span = Game.spawns[spawnName];
-    const workerList = creepMap.get("worker" /* Worker */);
-    if (!workerList) {
-        if (!span.spawning && span.room.energyAvailable >= _worker__WEBPACK_IMPORTED_MODULE_2__["Worker"].minEnergy) {
-            const worker = new _worker__WEBPACK_IMPORTED_MODULE_2__["Worker"]();
-            const result = worker.create(span, span.room.energyAvailable);
-            if (result !== OK) {
-                console.log(result);
-            }
-            else {
-                continue;
-            }
-        }
-    }
-    const carrierList = creepMap.get("carrier" /* Carrier */);
-    if (!carrierList) {
-        if (!span.spawning && span.room.energyAvailable >= _carrier__WEBPACK_IMPORTED_MODULE_0__["Carrier"].minEnergy) {
-            const carrier = new _carrier__WEBPACK_IMPORTED_MODULE_0__["Carrier"]();
-            const result = carrier.create(span, span.room.energyAvailable);
-            if (result !== OK) {
-                console.log(result);
-            }
-            else {
-                continue;
-            }
-        }
-    }
-    const walkerList = creepMap.get("walker" /* Walker */);
-    if (!walkerList) {
-        if (!span.spawning && span.room.energyAvailable >= _walker__WEBPACK_IMPORTED_MODULE_1__["Walker"].minEnergy) {
-            const walker = new _walker__WEBPACK_IMPORTED_MODULE_1__["Walker"]();
-            const result = walker.create(span, span.room.energyAvailable);
-            if (result !== OK) {
-                console.log(result);
-            }
-            else {
-                continue;
+    const spawn = Game.spawns[spawnName];
+    if (spawning !== null) {
+        const ctor = creepCtorMap[spawning];
+        if (spawn.room.energyAvailable >= ctor.minEnergy) {
+            const creep = new ctor();
+            const reuslt = creep.create(spawn, spawn.room.energyAvailable);
+            if (reuslt !== OK) {
+                console.log(reuslt);
             }
         }
     }
 }
-creepMap.forEach(creeps => creeps.forEach(creep => creep.ticker()));
-for (const key in creepCtorMap) {
-    const ctor = creepCtorMap[key];
-    Memory.ctors[key] = ctor.serialize();
-}
+
+
+/***/ }),
+
+/***/ "./src/upgrader.ts":
+/*!*************************!*\
+  !*** ./src/upgrader.ts ***!
+  \*************************/
+/*! exports provided: Upgrader */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Upgrader", function() { return Upgrader; });
+/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
+var _a;
+
+const Upgrader = (_a = class Upgrader {
+        create(spawn) {
+            const name = `${Upgrader.type}-${Game.time}`;
+            const result = spawn.spawnCreep(['work', 'carry', 'move'], name);
+            if (result === OK) {
+                this.creep = Game.creeps[name];
+                this.creep.memory = {
+                    type: "upgrader" /* Upgrader */,
+                    upgrading: false,
+                };
+            }
+            return result;
+        }
+        ticker() {
+            if (this.creep.memory.upgrading && this.creep.store[RESOURCE_ENERGY] === 0) {
+                if (this.creep.store[RESOURCE_ENERGY] === 0) {
+                    this.creep.memory.upgrading = false;
+                }
+            }
+            else {
+                if (this.creep.store.getFreeCapacity() === 0) {
+                    this.creep.memory.upgrading = true;
+                }
+            }
+            if (this.creep.memory.upgrading) {
+                if (this.creep.upgradeController(this.creep.room.controller) === ERR_NOT_IN_RANGE) {
+                    this.creep.moveTo(this.creep.room.controller);
+                }
+                this.creep.say('升级中');
+            }
+            else {
+                const sources = this.creep.room.find(FIND_SOURCES);
+                if (this.creep.harvest(sources[0]) === ERR_NOT_IN_RANGE) {
+                    this.creep.moveTo(sources[0]);
+                }
+                this.creep.say('采矿中');
+            }
+            return true;
+        }
+    },
+    _a.type = "upgrader" /* Upgrader */,
+    _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
+    _a);
 
 
 /***/ }),
@@ -326,17 +502,10 @@ __webpack_require__.r(__webpack_exports__);
 var _a;
 
 const Walker = (_a = class Walker {
-        static serialize() {
-            return this.id;
-        }
-        static deserialize(data) {
-            this.id = data;
-        }
         create(spawn) {
-            const name = `${Walker.type}-${Walker.id}`;
-            const result = spawn.spawnCreep(['move'], `${Walker.type}-${Walker.id}`);
+            const name = `${Walker.type}-${Game.time}`;
+            const result = spawn.spawnCreep(['move'], `${Walker.type}-${Game.time}`);
             if (result === OK) {
-                Walker.id++;
                 this.creep = Game.creeps[name];
                 this.creep.memory = {
                     type: "walker" /* Walker */,
@@ -354,9 +523,9 @@ const Walker = (_a = class Walker {
                 memory.direction = 1 + Math.floor(Math.random() * 8);
             }
             this.creep.move(memory.direction);
+            return true;
         }
     },
-    _a.id = 0,
     _a.type = "walker" /* Walker */,
     _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['move']),
     _a);
@@ -378,17 +547,10 @@ __webpack_require__.r(__webpack_exports__);
 var _a;
 
 const Worker = (_a = class Worker {
-        static serialize() {
-            return this.id;
-        }
-        static deserialize(data) {
-            this.id = data;
-        }
         create(spawn) {
-            const name = `${Worker.type}-${Worker.id}`;
-            const result = spawn.spawnCreep(['work', 'move'], `${Worker.type}-${Worker.id}`);
+            const name = `${Worker.type}-${Game.time}`;
+            const result = spawn.spawnCreep(['work', 'move'], name);
             if (result === OK) {
-                Worker.id++;
                 this.creep = Game.creeps[name];
                 this.creep.memory = {
                     type: "worker" /* Worker */,
@@ -412,9 +574,9 @@ const Worker = (_a = class Worker {
                     this.creep.moveTo(target);
                 }
             }
+            return true;
         }
     },
-    _a.id = 0,
     _a.type = "worker" /* Worker */,
     _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'move']),
     _a);
