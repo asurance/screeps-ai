@@ -137,7 +137,9 @@ const Builder = (_a = class Builder {
                 this.creep = Game.creeps[name];
                 this.creep.memory = {
                     type: "builder" /* Builder */,
-                    building: false
+                    building: false,
+                    targetId: null,
+                    buildId: null,
                 };
             }
             return result;
@@ -155,119 +157,57 @@ const Builder = (_a = class Builder {
                 }
             }
             if (creep.memory.building) {
-                const targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-                if (targets.length) {
-                    if (creep.build(targets[0]) === ERR_NOT_IN_RANGE) {
-                        creep.moveTo(targets[0]);
+                let target = null;
+                if (this.creep.memory.buildId) {
+                    target = Game.getObjectById(this.creep.memory.buildId);
+                }
+                if (target === null) {
+                    const source = this.creep.room.find(FIND_CONSTRUCTION_SITES);
+                    if (source.length > 0) {
+                        target = source[Math.floor(Math.random() * source.length)];
+                        this.creep.memory.buildId = target.id;
                     }
-                    creep.say('建造中');
+                }
+                if (target) {
+                    if (this.creep.build(target) === ERR_NOT_IN_RANGE) {
+                        this.creep.moveTo(target);
+                    }
+                    this.creep.say('建造中');
                     return true;
                 }
                 else {
+                    this.creep.say('闲置中');
                     return false;
                 }
             }
             else {
-                const sources = creep.room.find(FIND_SOURCES);
-                if (creep.harvest(sources[0]) === ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[0]);
+                let target = null;
+                if (this.creep.memory.targetId) {
+                    target = Game.getObjectById(this.creep.memory.targetId);
                 }
-                creep.say('采矿中');
-                return true;
+                if (target === null) {
+                    const source = this.creep.room.find(FIND_SOURCES);
+                    if (source.length > 0) {
+                        target = source[Math.floor(Math.random() * source.length)];
+                        this.creep.memory.targetId = target.id;
+                    }
+                }
+                if (target) {
+                    if (this.creep.harvest(target) === ERR_NOT_IN_RANGE) {
+                        this.creep.moveTo(target);
+                    }
+                    this.creep.say('采矿中');
+                    return true;
+                }
+                else {
+                    this.creep.say('闲置中');
+                    return false;
+                }
             }
         }
     },
     _a.type = "builder" /* Builder */,
     _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
-    _a);
-
-
-/***/ }),
-
-/***/ "./src/carrier.ts":
-/*!************************!*\
-  !*** ./src/carrier.ts ***!
-  \************************/
-/*! exports provided: Carrier */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Carrier", function() { return Carrier; });
-/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
-var _a;
-
-const Carrier = (_a = class Carrier {
-        create(spawn) {
-            const name = `${Carrier.type}-${Game.time}`;
-            const result = spawn.spawnCreep(['work', 'move'], name);
-            if (result === OK) {
-                this.creep = Game.creeps[name];
-                this.creep.memory = {
-                    type: "carrier" /* Carrier */,
-                    pickup: true,
-                    targetId: null
-                };
-            }
-            return result;
-        }
-        ticker() {
-            const memory = this.creep.memory;
-            if (memory.pickup) {
-                if (this.creep.store.energy < this.creep.store.getCapacity('energy')) {
-                    if (memory.targetId === null) {
-                        const target = this.creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
-                        if (target) {
-                            memory.targetId = target.id;
-                        }
-                    }
-                    if (memory.targetId !== null) {
-                        this.creep.say('寻找资源');
-                        const target = Game.getObjectById(memory.targetId);
-                        if (this.creep.pickup(target) === ERR_NOT_IN_RANGE) {
-                            this.creep.moveTo(target);
-                        }
-                    }
-                    else {
-                        memory.pickup = false;
-                        memory.targetId = null;
-                    }
-                }
-                else {
-                    memory.pickup = false;
-                    memory.targetId = null;
-                }
-            }
-            else {
-                if (this.creep.store.energy > 0) {
-                    if (memory.targetId === null) {
-                        const target = this.creep.pos.findClosestByPath(FIND_MY_SPAWNS);
-                        if (target) {
-                            memory.targetId = target.id;
-                        }
-                    }
-                    if (memory.targetId !== null) {
-                        this.creep.say('放置资源');
-                        const target = Game.getObjectById(memory.targetId);
-                        if (this.creep.transfer(target, 'energy') === ERR_NOT_IN_RANGE) {
-                            this.creep.moveTo(target);
-                        }
-                    }
-                    else {
-                        memory.pickup = true;
-                        memory.targetId = null;
-                    }
-                }
-                else {
-                    memory.pickup = true;
-                    memory.targetId = null;
-                }
-            }
-            return true;
-        }
-    },
-    _a.type = "carrier" /* Carrier */,
-    _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['carry', 'move']),
     _a);
 
 
@@ -294,18 +234,35 @@ const Harvester = (_a = class Harvester {
                 this.creep = Game.creeps[name];
                 this.creep.memory = {
                     type: "harvester" /* Harvester */,
+                    targetId: null,
                 };
             }
             return result;
         }
         ticker() {
             if (this.creep.store.getFreeCapacity() > 0) {
-                const source = this.creep.room.find(FIND_SOURCES);
-                if (this.creep.harvest(source[0]) === ERR_NOT_IN_RANGE) {
-                    this.creep.moveTo(source[0]);
+                let target = null;
+                if (this.creep.memory.targetId) {
+                    target = Game.getObjectById(this.creep.memory.targetId);
                 }
-                this.creep.say('采矿中');
-                return true;
+                if (target === null) {
+                    const source = this.creep.room.find(FIND_SOURCES);
+                    if (source.length > 0) {
+                        target = source[Math.floor(Math.random() * source.length)];
+                        this.creep.memory.targetId = target.id;
+                    }
+                }
+                if (target) {
+                    if (this.creep.harvest(target) === ERR_NOT_IN_RANGE) {
+                        this.creep.moveTo(target);
+                    }
+                    this.creep.say('采矿中');
+                    return true;
+                }
+                else {
+                    this.creep.say('闲置中');
+                    return false;
+                }
             }
             else {
                 const targets = this.creep.room.find(FIND_STRUCTURES, {
@@ -347,14 +304,8 @@ const Harvester = (_a = class Harvester {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _builder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./builder */ "./src/builder.ts");
-/* harmony import */ var _carrier__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./carrier */ "./src/carrier.ts");
-/* harmony import */ var _harvester__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./harvester */ "./src/harvester.ts");
-/* harmony import */ var _upgrader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./upgrader */ "./src/upgrader.ts");
-/* harmony import */ var _walker__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./walker */ "./src/walker.ts");
-/* harmony import */ var _worker__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./worker */ "./src/worker.ts");
-
-
-
+/* harmony import */ var _harvester__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./harvester */ "./src/harvester.ts");
+/* harmony import */ var _upgrader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./upgrader */ "./src/upgrader.ts");
 
 
 
@@ -364,11 +315,8 @@ for (const key in Memory.creeps) {
     }
 }
 const creepCtorMap = {
-    worker: _worker__WEBPACK_IMPORTED_MODULE_5__["Worker"],
-    walker: _walker__WEBPACK_IMPORTED_MODULE_4__["Walker"],
-    carrier: _carrier__WEBPACK_IMPORTED_MODULE_1__["Carrier"],
-    harvester: _harvester__WEBPACK_IMPORTED_MODULE_2__["Harvester"],
-    upgrader: _upgrader__WEBPACK_IMPORTED_MODULE_3__["Upgrader"],
+    harvester: _harvester__WEBPACK_IMPORTED_MODULE_1__["Harvester"],
+    upgrader: _upgrader__WEBPACK_IMPORTED_MODULE_2__["Upgrader"],
     builder: _builder__WEBPACK_IMPORTED_MODULE_0__["Builder"],
 };
 const creepMap = new Map();
@@ -405,8 +353,8 @@ if (spawning === null) {
                 list.splice(index, 1);
             }
         }
-        spawning = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null;
     });
+    spawning = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null;
 }
 else {
     creepMap.forEach(creeps => creeps.forEach(creep => creep.ticker()));
@@ -424,6 +372,12 @@ for (const spawnName in Game.spawns) {
         }
     }
 }
+Game.killAllCreeps = () => {
+    for (const name in Game.creeps) {
+        Game.creeps[name].suicide();
+        delete Memory.creeps[name];
+    }
+};
 
 
 /***/ }),
@@ -450,12 +404,13 @@ const Upgrader = (_a = class Upgrader {
                 this.creep.memory = {
                     type: "upgrader" /* Upgrader */,
                     upgrading: false,
+                    targetId: null,
                 };
             }
             return result;
         }
         ticker() {
-            if (this.creep.memory.upgrading && this.creep.store[RESOURCE_ENERGY] === 0) {
+            if (this.creep.memory.upgrading) {
                 if (this.creep.store[RESOURCE_ENERGY] === 0) {
                     this.creep.memory.upgrading = false;
                 }
@@ -470,115 +425,36 @@ const Upgrader = (_a = class Upgrader {
                     this.creep.moveTo(this.creep.room.controller);
                 }
                 this.creep.say('升级中');
+                return true;
             }
             else {
-                const sources = this.creep.room.find(FIND_SOURCES);
-                if (this.creep.harvest(sources[0]) === ERR_NOT_IN_RANGE) {
-                    this.creep.moveTo(sources[0]);
+                let target = null;
+                if (this.creep.memory.targetId) {
+                    target = Game.getObjectById(this.creep.memory.targetId);
                 }
-                this.creep.say('采矿中');
+                if (target === null) {
+                    const source = this.creep.room.find(FIND_SOURCES);
+                    if (source.length > 0) {
+                        target = source[Math.floor(Math.random() * source.length)];
+                        this.creep.memory.targetId = target.id;
+                    }
+                }
+                if (target) {
+                    if (this.creep.harvest(target) === ERR_NOT_IN_RANGE) {
+                        this.creep.moveTo(target);
+                    }
+                    this.creep.say('采矿中');
+                    return true;
+                }
+                else {
+                    this.creep.say('闲置中');
+                    return false;
+                }
             }
-            return true;
         }
     },
     _a.type = "upgrader" /* Upgrader */,
     _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
-    _a);
-
-
-/***/ }),
-
-/***/ "./src/walker.ts":
-/*!***********************!*\
-  !*** ./src/walker.ts ***!
-  \***********************/
-/*! exports provided: Walker */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Walker", function() { return Walker; });
-/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
-var _a;
-
-const Walker = (_a = class Walker {
-        create(spawn) {
-            const name = `${Walker.type}-${Game.time}`;
-            const result = spawn.spawnCreep(['move'], `${Walker.type}-${Game.time}`);
-            if (result === OK) {
-                this.creep = Game.creeps[name];
-                this.creep.memory = {
-                    type: "walker" /* Walker */,
-                    direction: 1 + Math.floor(Math.random() * 8),
-                    restTick: 60,
-                };
-            }
-            return result;
-        }
-        ticker() {
-            const memory = this.creep.memory;
-            memory.restTick--;
-            if (memory.restTick < 0) {
-                memory.restTick = 60;
-                memory.direction = 1 + Math.floor(Math.random() * 8);
-            }
-            this.creep.move(memory.direction);
-            return true;
-        }
-    },
-    _a.type = "walker" /* Walker */,
-    _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['move']),
-    _a);
-
-
-/***/ }),
-
-/***/ "./src/worker.ts":
-/*!***********************!*\
-  !*** ./src/worker.ts ***!
-  \***********************/
-/*! exports provided: Worker */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Worker", function() { return Worker; });
-/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
-var _a;
-
-const Worker = (_a = class Worker {
-        create(spawn) {
-            const name = `${Worker.type}-${Game.time}`;
-            const result = spawn.spawnCreep(['work', 'move'], name);
-            if (result === OK) {
-                this.creep = Game.creeps[name];
-                this.creep.memory = {
-                    type: "worker" /* Worker */,
-                    targetId: null,
-                };
-            }
-            return result;
-        }
-        ticker() {
-            const memory = this.creep.memory;
-            if (memory.targetId === null) {
-                const target = this.creep.pos.findClosestByPath(FIND_SOURCES);
-                if (target) {
-                    memory.targetId = target.id;
-                }
-            }
-            if (memory.targetId !== null) {
-                this.creep.say('采矿中');
-                const target = Game.getObjectById(memory.targetId);
-                if (this.creep.harvest(target) === ERR_NOT_IN_RANGE) {
-                    this.creep.moveTo(target);
-                }
-            }
-            return true;
-        }
-    },
-    _a.type = "worker" /* Worker */,
-    _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'move']),
     _a);
 
 
