@@ -15,7 +15,7 @@ export const Upgrader: BaseCreepCtor<CreepType.Upgrader> = class Upgrader implem
     creep!: Creep<Data>
 
     create(spawn: StructureSpawn): ScreepsReturnCode {
-        const name = `${Upgrader.type}-${Game.time}`
+        const name = `${spawn.name}-${Game.time}`
         const result = spawn.spawnCreep(['work', 'carry', 'move'], name)
         if (result === OK) {
             this.creep = Game.creeps[name] as Creep<Data>

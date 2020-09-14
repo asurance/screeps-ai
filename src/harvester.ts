@@ -14,7 +14,7 @@ export const Harvester: BaseCreepCtor<CreepType.Harvester> = class Harvester imp
     creep!: Creep<Data>
 
     create(spawn: StructureSpawn): ScreepsReturnCode {
-        const name = `${Harvester.type}-${Game.time}`
+        const name = `${spawn.name}-${Game.time}`
         const result = spawn.spawnCreep(['work', 'carry', 'move'], name)
         if (result === OK) {
             this.creep = Game.creeps[name] as Creep<Data>

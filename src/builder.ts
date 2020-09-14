@@ -16,7 +16,7 @@ export const Builder: BaseCreepCtor<CreepType.Builder> = class Builder implement
     creep!: Creep<Data>
 
     create(spawn: StructureSpawn): ScreepsReturnCode {
-        const name = `${Builder.type}-${Game.time}`
+        const name = `${spawn.name}-${Game.time}`
         const result = spawn.spawnCreep(['work', 'carry', 'move'], name)
         if (result === OK) {
             this.creep = Game.creeps[name] as Creep<Data>
