@@ -86,36 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/baseCreep.ts":
-/*!**************************!*\
-  !*** ./src/baseCreep.ts ***!
-  \**************************/
-/*! exports provided: EnergyMap, GetRequiredEnergy */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EnergyMap", function() { return EnergyMap; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GetRequiredEnergy", function() { return GetRequiredEnergy; });
-const EnergyMap = {
-    move: 50,
-    work: 100,
-    carry: 50,
-    attack: 80,
-    ranged_attack: 150,
-    heal: 250,
-    claim: 600,
-    tough: 10
-};
-function GetRequiredEnergy(body) {
-    return body.reduce((pre, cur) => {
-        return pre + EnergyMap[cur];
-    }, 0);
-}
-
-
-/***/ }),
-
 /***/ "./src/build.ts":
 /*!**********************!*\
   !*** ./src/build.ts ***!
@@ -126,8 +96,6 @@ function GetRequiredEnergy(body) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Build", function() { return Build; });
-/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ "./src/util.ts");
-
 function Build(creep) {
     let target = null;
     if (creep.memory.buildId) {
@@ -135,8 +103,15 @@ function Build(creep) {
     }
     if (target === null) {
         const source = creep.room.find(FIND_CONSTRUCTION_SITES);
-        target = Object(_util__WEBPACK_IMPORTED_MODULE_0__["RandomObjectInList"])(source);
-        if (target) {
+        if (source.length > 0) {
+            target = source.reduce((pre, cur) => {
+                if ((pre.progress + 1) / pre.progressTotal < (cur.progress + 1) / cur.progressTotal) {
+                    return cur;
+                }
+                else {
+                    return pre;
+                }
+            });
             creep.memory.buildId = target.id;
         }
     }
@@ -166,7 +141,7 @@ function Build(creep) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BuilderController", function() { return BuilderController; });
-/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
+/* harmony import */ var _creepController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./creepController */ "./src/creepController.ts");
 /* harmony import */ var _build__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./build */ "./src/build.ts");
 /* harmony import */ var _harvest__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./harvest */ "./src/harvest.ts");
 /* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util */ "./src/util.ts");
@@ -176,10 +151,10 @@ __webpack_require__.r(__webpack_exports__);
 
 const BuilderController = {
     type: "builder" /* Builder */,
-    minEnergy: Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
+    minEnergy: Object(_creepController__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
     create(spawn, name, maxEnergy) {
         const body = ['work', 'carry', 'move'];
-        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _baseCreep__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _creepController__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
         if (maxCount > 0) {
             const count = Object(_util__WEBPACK_IMPORTED_MODULE_3__["RandomInt"])(maxCount + 1);
             if (count > 0) {
@@ -217,6 +192,36 @@ const BuilderController = {
         }
     },
 };
+
+
+/***/ }),
+
+/***/ "./src/creepController.ts":
+/*!********************************!*\
+  !*** ./src/creepController.ts ***!
+  \********************************/
+/*! exports provided: EnergyMap, GetRequiredEnergy */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EnergyMap", function() { return EnergyMap; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GetRequiredEnergy", function() { return GetRequiredEnergy; });
+const EnergyMap = {
+    move: 50,
+    work: 100,
+    carry: 50,
+    attack: 80,
+    ranged_attack: 150,
+    heal: 250,
+    claim: 600,
+    tough: 10
+};
+function GetRequiredEnergy(body) {
+    return body.reduce((pre, cur) => {
+        return pre + EnergyMap[cur];
+    }, 0);
+}
 
 
 /***/ }),
@@ -271,7 +276,7 @@ function Harvest(creep) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HarvesterController", function() { return HarvesterController; });
-/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
+/* harmony import */ var _creepController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./creepController */ "./src/creepController.ts");
 /* harmony import */ var _harvest__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./harvest */ "./src/harvest.ts");
 /* harmony import */ var _transfer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./transfer */ "./src/transfer.ts");
 /* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util */ "./src/util.ts");
@@ -281,10 +286,10 @@ __webpack_require__.r(__webpack_exports__);
 
 const HarvesterController = {
     type: "harvester" /* Harvester */,
-    minEnergy: Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
+    minEnergy: Object(_creepController__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
     create(spawn, name, maxEnergy) {
         const body = ['work', 'carry', 'move'];
-        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _baseCreep__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _creepController__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
         if (maxCount > 0) {
             const count = Object(_util__WEBPACK_IMPORTED_MODULE_3__["RandomInt"])(maxCount + 1);
             if (count > 0) {
@@ -338,9 +343,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _harvesterController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./harvesterController */ "./src/harvesterController.ts");
 /* harmony import */ var _upgraderController__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./upgraderController */ "./src/upgraderController.ts");
 /* harmony import */ var _builderController__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./builderController */ "./src/builderController.ts");
-/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util */ "./src/util.ts");
-/* harmony import */ var _patch__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./patch */ "./src/patch.ts");
-/* harmony import */ var _patch__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_patch__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _repairerController__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./repairerController */ "./src/repairerController.ts");
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./util */ "./src/util.ts");
+/* harmony import */ var _patch__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./patch */ "./src/patch.ts");
+/* harmony import */ var _patch__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_patch__WEBPACK_IMPORTED_MODULE_5__);
+
 
 
 
@@ -355,6 +362,7 @@ const creepControllerMap = {
     harvester: _harvesterController__WEBPACK_IMPORTED_MODULE_0__["HarvesterController"],
     upgrader: _upgraderController__WEBPACK_IMPORTED_MODULE_1__["UpgraderController"],
     builder: _builderController__WEBPACK_IMPORTED_MODULE_2__["BuilderController"],
+    repairer: _repairerController__WEBPACK_IMPORTED_MODULE_3__["RepairController"],
 };
 const creepMap = new Map();
 for (const creepName in Game.creeps) {
@@ -396,7 +404,7 @@ if (spawning === null && list.length > 0) {
             }
         }
     });
-    spawning = Object(_util__WEBPACK_IMPORTED_MODULE_3__["RandomObjectInList"])(list);
+    spawning = Object(_util__WEBPACK_IMPORTED_MODULE_4__["RandomObjectInList"])(list);
 }
 else {
     creepMap.forEach(creeps => creeps.forEach(creep => creepControllerMap[creep.memory.type].ticker(creep)));
@@ -432,6 +440,131 @@ Game.killAllCreeps = () => {
         Game.creeps[name].suicide();
         delete Memory.creeps[name];
     }
+};
+
+
+/***/ }),
+
+/***/ "./src/repair.ts":
+/*!***********************!*\
+  !*** ./src/repair.ts ***!
+  \***********************/
+/*! exports provided: Repair */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Repair", function() { return Repair; });
+function Repair(creep) {
+    let target = null;
+    if (creep.memory.repairId) {
+        target = Game.getObjectById(creep.memory.repairId);
+    }
+    if (target === null) {
+        const source = creep.room.find(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return structure.hits < structure.hitsMax;
+            }
+        });
+        if (source.length > 0) {
+            target = source.reduce((pre, cur) => {
+                if (pre.hits < cur.hits) {
+                    return pre;
+                }
+                else {
+                    return cur;
+                }
+            });
+            creep.memory.repairId = target.id;
+        }
+    }
+    if (target) {
+        if (creep.repair(target) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+        }
+        creep.say('维修中');
+        return true;
+    }
+    else {
+        creep.say('闲置中');
+        return false;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/repairerController.ts":
+/*!***********************************!*\
+  !*** ./src/repairerController.ts ***!
+  \***********************************/
+/*! exports provided: RepairController */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RepairController", function() { return RepairController; });
+/* harmony import */ var _creepController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./creepController */ "./src/creepController.ts");
+/* harmony import */ var _harvest__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./harvest */ "./src/harvest.ts");
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./util */ "./src/util.ts");
+/* harmony import */ var _repair__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./repair */ "./src/repair.ts");
+
+
+
+
+const RepairController = {
+    type: "repairer" /* Repairer */,
+    minEnergy: Object(_creepController__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
+    create(spawn, name, maxEnergy) {
+        const body = ['work', 'carry', 'move'];
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _creepController__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
+        if (maxCount > 0) {
+            const count = Object(_util__WEBPACK_IMPORTED_MODULE_2__["RandomInt"])(maxCount + 1);
+            if (count > 0) {
+                body.splice(1, 0, ...new Array(count).fill('carry'));
+            }
+        }
+        return spawn.spawnCreep(body, name);
+    },
+    ticker(creep) {
+        var _a, _b;
+        let repairing = (_a = creep.memory.repairing) !== null && _a !== void 0 ? _a : false;
+        if (repairing) {
+            if (creep.store[RESOURCE_ENERGY] === 0) {
+                repairing = false;
+                delete creep.memory.repairId;
+                delete creep.memory.repairTick;
+            }
+            else {
+                const tick = ((_b = creep.memory.repairTick) !== null && _b !== void 0 ? _b : 300) - 1;
+                if (tick <= 0) {
+                    delete creep.memory.repairId;
+                    delete creep.memory.repairTick;
+                }
+                else {
+                    creep.memory.repairTick = tick;
+                }
+            }
+        }
+        else {
+            if (creep.store.getFreeCapacity() === 0) {
+                repairing = true;
+                delete creep.memory.harvestId;
+            }
+        }
+        if (repairing) {
+            creep.memory.repairing = true;
+        }
+        else {
+            delete creep.memory.repairing;
+        }
+        if (repairing) {
+            return Object(_repair__WEBPACK_IMPORTED_MODULE_3__["Repair"])(creep);
+        }
+        else {
+            return Object(_harvest__WEBPACK_IMPORTED_MODULE_1__["Harvest"])(creep);
+        }
+    },
 };
 
 
@@ -521,7 +654,7 @@ function Upgrade(creep) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UpgraderController", function() { return UpgraderController; });
-/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
+/* harmony import */ var _creepController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./creepController */ "./src/creepController.ts");
 /* harmony import */ var _harvest__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./harvest */ "./src/harvest.ts");
 /* harmony import */ var _upgrade__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./upgrade */ "./src/upgrade.ts");
 /* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util */ "./src/util.ts");
@@ -531,10 +664,10 @@ __webpack_require__.r(__webpack_exports__);
 
 const UpgraderController = {
     type: "upgrader" /* Upgrader */,
-    minEnergy: Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
+    minEnergy: Object(_creepController__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
     create(spawn, name, maxEnergy) {
         const body = ['work', 'carry', 'move'];
-        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _baseCreep__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _creepController__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
         if (maxCount > 0) {
             const count = Object(_util__WEBPACK_IMPORTED_MODULE_3__["RandomInt"])(maxCount + 1);
             if (count > 0) {
