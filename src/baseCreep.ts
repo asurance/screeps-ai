@@ -1,15 +1,13 @@
 export interface BaseCreep {
     creep: Creep
     create(spawn: StructureSpawn, maxEnergy: number): ScreepsReturnCode
-    ticker(): void
+    ticker(): boolean
 }
 
 export interface BaseCreepCtor<T extends CreepType> {
     new(...argv: unknown[]): BaseCreep
     readonly type: T
     readonly minEnergy: number
-    serialize(): CreepDataMap[T]
-    deserialize(data: CreepDataMap[T]): void
 }
 
 export const EnergyMap: { [key in BodyPartConstant]: number } = {

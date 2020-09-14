@@ -8,27 +8,16 @@ interface Data extends MemoryData {
 
 export const Carrier: BaseCreepCtor<CreepType.Carrier> = class Carrier implements BaseCreep {
 
-    private static id = 0
-
     static readonly type = CreepType.Carrier
 
     static readonly minEnergy = GetRequiredEnergy(['carry', 'move'])
 
-    static serialize(): number {
-        return this.id
-    }
-
-    static deserialize(data: number): void {
-        this.id = data
-    }
-
     creep!: Creep<Data>
 
     create(spawn: StructureSpawn): ScreepsReturnCode {
-        const name = `${Carrier.type}-${Carrier.id}`
-        const result = spawn.spawnCreep(['work', 'move'], `${Carrier.type}-${Carrier.id}`)
+        const name = `${Carrier.type}-${Game.time}`
+        const result = spawn.spawnCreep(['work', 'move'], name)
         if (result === OK) {
-            Carrier.id++
             this.creep = Game.creeps[name] as Creep<Data>
             this.creep.memory = {
                 type: CreepType.Carrier,
@@ -39,7 +28,7 @@ export const Carrier: BaseCreepCtor<CreepType.Carrier> = class Carrier implement
         return result
     }
 
-    ticker(): void {
+    ticker(): boolean {
         const memory = this.creep.memory
         if (memory.pickup) {
             if (this.creep.store.energy < this.creep.store.getCapacity('energy')) {
@@ -86,5 +75,6 @@ export const Carrier: BaseCreepCtor<CreepType.Carrier> = class Carrier implement
                 memory.targetId = null
             }
         }
+        return true
     }
 }

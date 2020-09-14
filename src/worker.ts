@@ -7,27 +7,16 @@ interface Data extends MemoryData {
 
 export const Worker: BaseCreepCtor<CreepType.Worker> = class Worker implements BaseCreep {
 
-    private static id = 0
-
     static readonly type = CreepType.Worker
 
     static readonly minEnergy = GetRequiredEnergy(['work', 'move'])
 
-    static serialize(): number {
-        return this.id
-    }
-
-    static deserialize(data: number): void {
-        this.id = data
-    }
-
     creep!: Creep<Data>
 
     create(spawn: StructureSpawn): ScreepsReturnCode {
-        const name = `${Worker.type}-${Worker.id}`
-        const result = spawn.spawnCreep(['work', 'move'], `${Worker.type}-${Worker.id}`)
+        const name = `${Worker.type}-${Game.time}`
+        const result = spawn.spawnCreep(['work', 'move'], name)
         if (result === OK) {
-            Worker.id++
             this.creep = Game.creeps[name] as Creep<Data>
             this.creep.memory = {
                 type: CreepType.Worker,
@@ -37,7 +26,7 @@ export const Worker: BaseCreepCtor<CreepType.Worker> = class Worker implements B
         return result
     }
 
-    ticker(): void {
+    ticker(): boolean {
         const memory = this.creep.memory
         if (memory.targetId === null) {
             const target = this.creep.pos.findClosestByPath(FIND_SOURCES)
@@ -52,5 +41,6 @@ export const Worker: BaseCreepCtor<CreepType.Worker> = class Worker implements B
                 this.creep.moveTo(target)
             }
         }
+        return true
     }
 } 

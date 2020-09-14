@@ -1,5 +1,8 @@
 import { BaseCreep, BaseCreepCtor } from './baseCreep'
+import { Builder } from './builder'
 import { Carrier } from './carrier'
+import { Harvester } from './harvester'
+import { Upgrader } from './upgrader'
 import { Walker } from './walker'
 import { Worker } from './worker'
 
@@ -13,19 +16,9 @@ const creepCtorMap: { [key in CreepType]: BaseCreepCtor<CreepType> } = {
     worker: Worker,
     walker: Walker,
     carrier: Carrier,
-}
-
-if (!Memory.ctors) {
-    Memory.ctors = {
-        walker: 0,
-        carrier: 0,
-        worker: 0,
-    }
-}
-
-for (const key in creepCtorMap) {
-    const ctor = creepCtorMap[key as CreepType]
-    ctor.deserialize(Memory.ctors[key as CreepType])
+    harvester: Harvester,
+    upgrader: Upgrader,
+    builder: Builder,
 }
 
 const creepMap = new Map<CreepType, BaseCreep[]>()
@@ -42,49 +35,44 @@ for (const creepName in Game.creeps) {
     }
 }
 
-for (const spawnName in Game.spawns) {
-    const span = Game.spawns[spawnName]
-    const workerList = creepMap.get(CreepType.Worker)
-    if (!workerList) {
-        if (!span.spawning && span.room.energyAvailable >= Worker.minEnergy) {
-            const worker = new Worker()
-            const result = worker.create(span, span.room.energyAvailable)
-            if (result !== OK) {
-                console.log(result)
-            } else {
-                continue
-            }
-        }
-    }
-    const carrierList = creepMap.get(CreepType.Carrier)
-    if (!carrierList) {
-        if (!span.spawning && span.room.energyAvailable >= Carrier.minEnergy) {
-            const carrier = new Carrier()
-            const result = carrier.create(span, span.room.energyAvailable)
-            if (result !== OK) {
-                console.log(result)
-            } else {
-                continue
-            }
-        }
-    }
-    const walkerList = creepMap.get(CreepType.Walker)
-    if (!walkerList) {
-        if (!span.spawning && span.room.energyAvailable >= Walker.minEnergy) {
-            const walker = new Walker()
-            const result = walker.create(span, span.room.energyAvailable)
-            if (result !== OK) {
-                console.log(result)
-            } else {
-                continue
-            }
-        }
+let spawning: CreepType | null = null
+
+const list = [CreepType.Harvester, CreepType.Upgrader, CreepType.Builder]
+for (let i = 0; i < list.length; i++) {
+    const l = creepMap.get(list[i])
+    if (!l) {
+        spawning = list[i]
+        break
     }
 }
+if (spawning === null) {
+    creepMap.forEach((creeps, type) => {
+        let flag = true
+        for (let i = 0; i < creeps.length; i++) {
+            flag = creeps[i].ticker() && flag
+        }
+        if (!flag) {
+            const index = list.indexOf(type)
+            if (index >= 0) {
+                list.splice(index, 1)
+            }
+        }
+        spawning = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null
+    })
+} else {
+    creepMap.forEach(creeps => creeps.forEach(creep => creep.ticker()))
+}
 
-creepMap.forEach(creeps => creeps.forEach(creep => creep.ticker()))
-
-for (const key in creepCtorMap) {
-    const ctor = creepCtorMap[key as CreepType]
-    Memory.ctors[key as CreepType] = ctor.serialize()
+for (const spawnName in Game.spawns) {
+    const spawn = Game.spawns[spawnName]
+    if (spawning !== null) {
+        const ctor = creepCtorMap[spawning]
+        if (spawn.room.energyAvailable >= ctor.minEnergy) {
+            const creep = new ctor()
+            const reuslt = creep.create(spawn, spawn.room.energyAvailable)
+            if (reuslt !== OK) {
+                console.log(reuslt)
+            }
+        }
+    }
 }

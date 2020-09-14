@@ -8,27 +8,16 @@ interface Data extends MemoryData {
 
 export const Walker: BaseCreepCtor<CreepType.Walker> = class Walker implements BaseCreep {
 
-    private static id = 0
-
     static readonly type = CreepType.Walker
 
     static readonly minEnergy = GetRequiredEnergy(['move'])
 
-    static serialize(): number {
-        return this.id
-    }
-
-    static deserialize(data: number): void {
-        this.id = data
-    }
-
     creep!: Creep<Data>
 
     create(spawn: StructureSpawn): ScreepsReturnCode {
-        const name = `${Walker.type}-${Walker.id}`
-        const result = spawn.spawnCreep(['move'], `${Walker.type}-${Walker.id}`)
+        const name = `${Walker.type}-${Game.time}`
+        const result = spawn.spawnCreep(['move'], `${Walker.type}-${Game.time}`)
         if (result === OK) {
-            Walker.id++
             this.creep = Game.creeps[name] as Creep<Data>
             this.creep.memory = {
                 type: CreepType.Walker,
@@ -39,7 +28,7 @@ export const Walker: BaseCreepCtor<CreepType.Walker> = class Walker implements B
         return result
     }
 
-    ticker(): void {
+    ticker(): boolean {
         const memory = this.creep.memory
         memory.restTick--
         if (memory.restTick < 0) {
@@ -47,6 +36,7 @@ export const Walker: BaseCreepCtor<CreepType.Walker> = class Walker implements B
             memory.direction = 1 + Math.floor(Math.random() * 8) as DirectionConstant
         }
         this.creep.move(memory.direction)
+        return true
     }
 
 }

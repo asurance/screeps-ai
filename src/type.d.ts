@@ -1,7 +1,3 @@
-interface Memory {
-    ctors: { [key in CreepType]: CreepDataMap[key] }
-}
-
 interface Creep<T extends MemoryData = MemoryData> {
     memory: T
 }
@@ -14,10 +10,7 @@ const enum CreepType {
     Worker = 'worker',
     Carrier = 'carrier',
     Walker = 'walker',
-}
-
-interface CreepDataMap {
-    [CreepType.Worker]: number
-    [CreepType.Carrier]: number
-    [CreepType.Walker]: number
+    Harvester = 'harvester',
+    Upgrader = 'upgrader',
+    Builder = 'builder',
 }
