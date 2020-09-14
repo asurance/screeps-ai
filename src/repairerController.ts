@@ -1,17 +1,19 @@
 import { CreepController, EnergyMap, GetRequiredEnergy } from './creepController'
 import { Harvest } from './harvest'
-import { Upgrade } from './upgrade'
 import { RandomInt } from './util'
+import { Repair } from './repair'
 
 interface Data extends MemoryData {
-    type: CreepType.Upgrader
-    upgrading?: boolean
+    type: CreepType.Repairer
+    repairing?: boolean
     harvestId?: Id<Source>
+    repairId?: Id<Structure>
+    repairTick?: number
 }
 
-export const UpgraderController: CreepController<CreepType.Upgrader> = {
+export const RepairController: CreepController<CreepType.Repairer> = {
 
-    type: CreepType.Upgrader,
+    type: CreepType.Repairer,
 
     minEnergy: GetRequiredEnergy(['work', 'carry', 'move']),
 
@@ -28,25 +30,36 @@ export const UpgraderController: CreepController<CreepType.Upgrader> = {
     },
 
     ticker(creep: Creep<Data>) {
-        let upgrading = creep.memory.upgrading ?? false
-        if (upgrading) {
+        let repairing = creep.memory.repairing ?? false
+        if (repairing) {
             if (creep.store[RESOURCE_ENERGY] === 0) {
-                upgrading = false
+                repairing = false
+                delete creep.memory.repairId
+                delete creep.memory.repairTick
+            } else {
+                const tick = (creep.memory.repairTick ?? 300) - 1
+                if (tick <= 0) {
+                    delete creep.memory.repairId
+                    delete creep.memory.repairTick
+                } else {
+                    creep.memory.repairTick = tick
+                }
             }
         } else {
             if (creep.store.getFreeCapacity() === 0) {
-                upgrading = true
+                repairing = true
                 delete creep.memory.harvestId
             }
         }
-        if (upgrading) {
-            creep.memory.upgrading = true
+        if (repairing) {
+            creep.memory.repairing = true
         } else {
-            delete creep.memory.upgrading
+            delete creep.memory.repairing
         }
-        if (upgrading) {
-            return Upgrade(creep)
-        } else {
+        if (repairing) {
+            return Repair(creep)
+        }
+        else {
             return Harvest(creep)
         }
     },

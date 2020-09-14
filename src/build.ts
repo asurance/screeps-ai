@@ -1,5 +1,3 @@
-import { RandomObjectInList } from './util'
-
 interface Buildable extends MemoryData {
     buildId?: Id<ConstructionSite>
 }
@@ -11,8 +9,14 @@ export function Build(creep: Creep<Buildable>): boolean {
     }
     if (target === null) {
         const source = creep.room.find(FIND_CONSTRUCTION_SITES)
-        target = RandomObjectInList(source)
-        if (target) {
+        if (source.length > 0) {
+            target = source.reduce((pre, cur) => {
+                if ((pre.progress + 1) / pre.progressTotal < (cur.progress + 1) / cur.progressTotal) {
+                    return cur
+                } else {
+                    return pre
+                }
+            })
             creep.memory.buildId = target.id
         }
     }

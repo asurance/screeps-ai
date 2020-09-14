@@ -14,4 +14,5 @@ const enum CreepType {
     Harvester = 'harvester',
     Upgrader = 'upgrader',
     Builder = 'builder',
+    Repairer = 'repairer',
 }

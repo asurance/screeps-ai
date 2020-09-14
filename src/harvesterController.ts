@@ -1,4 +1,4 @@
-import { CreepController, EnergyMap, GetRequiredEnergy } from './baseCreep'
+import { CreepController, EnergyMap, GetRequiredEnergy } from './creepController'
 import { Harvest } from './harvest'
 import { Transfer } from './transfer'
 import { RandomInt } from './util'
