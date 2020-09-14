@@ -116,180 +116,212 @@ function GetRequiredEnergy(body) {
 
 /***/ }),
 
-/***/ "./src/builder.ts":
-/*!************************!*\
-  !*** ./src/builder.ts ***!
-  \************************/
-/*! exports provided: Builder */
+/***/ "./src/build.ts":
+/*!**********************!*\
+  !*** ./src/build.ts ***!
+  \**********************/
+/*! exports provided: Build */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Builder", function() { return Builder; });
-/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
-var _a;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Build", function() { return Build; });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ "./src/util.ts");
 
-const Builder = (_a = class Builder {
-        create(spawn) {
-            const name = `${spawn.name}-${Game.time}`;
-            const result = spawn.spawnCreep(['work', 'carry', 'move'], name);
-            if (result === OK) {
-                this.creep = Game.creeps[name];
-                this.creep.memory = {
-                    type: "builder" /* Builder */,
-                    building: false,
-                    targetId: null,
-                    buildId: null,
-                };
-            }
-            return result;
+function Build(creep) {
+    let target = null;
+    if (creep.memory.buildId) {
+        target = Game.getObjectById(creep.memory.buildId);
+    }
+    if (target === null) {
+        const source = creep.room.find(FIND_CONSTRUCTION_SITES);
+        target = Object(_util__WEBPACK_IMPORTED_MODULE_0__["RandomObjectInList"])(source);
+        if (target) {
+            creep.memory.buildId = target.id;
         }
-        ticker() {
-            const creep = this.creep;
-            if (creep.memory.building) {
-                if (creep.store[RESOURCE_ENERGY] === 0) {
-                    creep.memory.building = false;
-                }
-            }
-            else {
-                if (creep.store.getFreeCapacity() === 0) {
-                    creep.memory.building = true;
-                }
-            }
-            if (creep.memory.building) {
-                let target = null;
-                if (this.creep.memory.buildId) {
-                    target = Game.getObjectById(this.creep.memory.buildId);
-                }
-                if (target === null) {
-                    const source = this.creep.room.find(FIND_CONSTRUCTION_SITES);
-                    if (source.length > 0) {
-                        target = source[Math.floor(Math.random() * source.length)];
-                        this.creep.memory.buildId = target.id;
-                    }
-                }
-                if (target) {
-                    if (this.creep.build(target) === ERR_NOT_IN_RANGE) {
-                        this.creep.moveTo(target);
-                    }
-                    this.creep.say('建造中');
-                    return true;
-                }
-                else {
-                    this.creep.say('闲置中');
-                    return false;
-                }
-            }
-            else {
-                let target = null;
-                if (this.creep.memory.targetId) {
-                    target = Game.getObjectById(this.creep.memory.targetId);
-                }
-                if (target === null) {
-                    const source = this.creep.room.find(FIND_SOURCES);
-                    if (source.length > 0) {
-                        target = source[Math.floor(Math.random() * source.length)];
-                        this.creep.memory.targetId = target.id;
-                    }
-                }
-                if (target) {
-                    if (this.creep.harvest(target) === ERR_NOT_IN_RANGE) {
-                        this.creep.moveTo(target);
-                    }
-                    this.creep.say('采矿中');
-                    return true;
-                }
-                else {
-                    this.creep.say('闲置中');
-                    return false;
-                }
-            }
+    }
+    if (target) {
+        if (creep.build(target) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
         }
-    },
-    _a.type = "builder" /* Builder */,
-    _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
-    _a);
+        creep.say('建造中');
+        return true;
+    }
+    else {
+        creep.say('闲置中');
+        return false;
+    }
+}
 
 
 /***/ }),
 
-/***/ "./src/harvester.ts":
-/*!**************************!*\
-  !*** ./src/harvester.ts ***!
-  \**************************/
-/*! exports provided: Harvester */
+/***/ "./src/builderController.ts":
+/*!**********************************!*\
+  !*** ./src/builderController.ts ***!
+  \**********************************/
+/*! exports provided: BuilderController */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Harvester", function() { return Harvester; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BuilderController", function() { return BuilderController; });
 /* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
-var _a;
+/* harmony import */ var _build__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./build */ "./src/build.ts");
+/* harmony import */ var _harvest__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./harvest */ "./src/harvest.ts");
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util */ "./src/util.ts");
 
-const Harvester = (_a = class Harvester {
-        create(spawn) {
-            const name = `${spawn.name}-${Game.time}`;
-            const result = spawn.spawnCreep(['work', 'carry', 'move'], name);
-            if (result === OK) {
-                this.creep = Game.creeps[name];
-                this.creep.memory = {
-                    type: "harvester" /* Harvester */,
-                    targetId: null,
-                };
+
+
+
+const BuilderController = {
+    type: "builder" /* Builder */,
+    minEnergy: Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
+    create(spawn, name, maxEnergy) {
+        const body = ['work', 'carry', 'move'];
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _baseCreep__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
+        if (maxCount > 0) {
+            const count = Object(_util__WEBPACK_IMPORTED_MODULE_3__["RandomInt"])(maxCount + 1);
+            if (count > 0) {
+                body.splice(1, 0, ...new Array(count).fill('carry'));
             }
-            return result;
         }
-        ticker() {
-            if (this.creep.store.getFreeCapacity() > 0) {
-                let target = null;
-                if (this.creep.memory.targetId) {
-                    target = Game.getObjectById(this.creep.memory.targetId);
-                }
-                if (target === null) {
-                    const source = this.creep.room.find(FIND_SOURCES);
-                    if (source.length > 0) {
-                        target = source[Math.floor(Math.random() * source.length)];
-                        this.creep.memory.targetId = target.id;
-                    }
-                }
-                if (target) {
-                    if (this.creep.harvest(target) === ERR_NOT_IN_RANGE) {
-                        this.creep.moveTo(target);
-                    }
-                    this.creep.say('采矿中');
-                    return true;
-                }
-                else {
-                    this.creep.say('闲置中');
-                    return false;
-                }
+        return spawn.spawnCreep(body, name);
+    },
+    ticker(creep) {
+        var _a;
+        let building = (_a = creep.memory.building) !== null && _a !== void 0 ? _a : false;
+        if (building) {
+            if (creep.store[RESOURCE_ENERGY] === 0) {
+                building = false;
+                delete creep.memory.buildId;
             }
-            else {
-                const targets = this.creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return structure.structureType === STRUCTURE_EXTENSION
-                            || structure.structureType === STRUCTURE_SPAWN
-                            || structure.structureType === STRUCTURE_TOWER
-                                && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
-                    }
-                });
-                if (targets.length > 0) {
-                    if (this.creep.transfer(targets[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                        this.creep.moveTo(targets[0]);
-                    }
-                    this.creep.say('运输中');
-                    return true;
-                }
-                else {
-                    this.creep.say('闲置中');
-                    return false;
-                }
+        }
+        else {
+            if (creep.store.getFreeCapacity() === 0) {
+                building = true;
+                delete creep.memory.harvestId;
             }
+        }
+        if (building) {
+            creep.memory.building = true;
+        }
+        else {
+            delete creep.memory.building;
+        }
+        if (building) {
+            return Object(_build__WEBPACK_IMPORTED_MODULE_1__["Build"])(creep);
+        }
+        else {
+            return Object(_harvest__WEBPACK_IMPORTED_MODULE_2__["Harvest"])(creep);
         }
     },
-    _a.type = "harvester" /* Harvester */,
-    _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
-    _a);
+};
+
+
+/***/ }),
+
+/***/ "./src/harvest.ts":
+/*!************************!*\
+  !*** ./src/harvest.ts ***!
+  \************************/
+/*! exports provided: Harvest */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Harvest", function() { return Harvest; });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ "./src/util.ts");
+
+function Harvest(creep) {
+    let target = null;
+    if (creep.memory.harvestId) {
+        target = Game.getObjectById(creep.memory.harvestId);
+    }
+    if (target === null) {
+        const source = creep.room.find(FIND_SOURCES);
+        target = Object(_util__WEBPACK_IMPORTED_MODULE_0__["RandomObjectInList"])(source);
+        if (target) {
+            creep.memory.harvestId = target.id;
+        }
+    }
+    if (target) {
+        if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+        }
+        creep.say('采集中');
+        return true;
+    }
+    else {
+        creep.say('闲置中');
+        return false;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/harvesterController.ts":
+/*!************************************!*\
+  !*** ./src/harvesterController.ts ***!
+  \************************************/
+/*! exports provided: HarvesterController */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HarvesterController", function() { return HarvesterController; });
+/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
+/* harmony import */ var _harvest__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./harvest */ "./src/harvest.ts");
+/* harmony import */ var _transfer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./transfer */ "./src/transfer.ts");
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util */ "./src/util.ts");
+
+
+
+
+const HarvesterController = {
+    type: "harvester" /* Harvester */,
+    minEnergy: Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
+    create(spawn, name, maxEnergy) {
+        const body = ['work', 'carry', 'move'];
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _baseCreep__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
+        if (maxCount > 0) {
+            const count = Object(_util__WEBPACK_IMPORTED_MODULE_3__["RandomInt"])(maxCount + 1);
+            if (count > 0) {
+                body.splice(1, 0, ...new Array(count).fill('carry'));
+            }
+        }
+        return spawn.spawnCreep(body, name);
+    },
+    ticker(creep) {
+        var _a;
+        let transfering = (_a = creep.memory.transfering) !== null && _a !== void 0 ? _a : false;
+        if (transfering) {
+            if (creep.store[RESOURCE_ENERGY] === 0) {
+                transfering = false;
+                delete creep.memory.transferId;
+            }
+        }
+        else {
+            if (creep.store.getFreeCapacity() === 0) {
+                transfering = true;
+                delete creep.memory.harvestId;
+            }
+        }
+        if (transfering) {
+            creep.memory.transfering = true;
+        }
+        else {
+            delete creep.memory.transfering;
+        }
+        if (transfering) {
+            return Object(_transfer__WEBPACK_IMPORTED_MODULE_2__["Transfer"])(creep);
+        }
+        else {
+            return Object(_harvest__WEBPACK_IMPORTED_MODULE_1__["Harvest"])(creep);
+        }
+    },
+};
 
 
 /***/ }),
@@ -303,9 +335,14 @@ const Harvester = (_a = class Harvester {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _builder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./builder */ "./src/builder.ts");
-/* harmony import */ var _harvester__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./harvester */ "./src/harvester.ts");
-/* harmony import */ var _upgrader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./upgrader */ "./src/upgrader.ts");
+/* harmony import */ var _harvesterController__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./harvesterController */ "./src/harvesterController.ts");
+/* harmony import */ var _upgraderController__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./upgraderController */ "./src/upgraderController.ts");
+/* harmony import */ var _builderController__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./builderController */ "./src/builderController.ts");
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util */ "./src/util.ts");
+/* harmony import */ var _patch__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./patch */ "./src/patch.ts");
+/* harmony import */ var _patch__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_patch__WEBPACK_IMPORTED_MODULE_4__);
+
+
 
 
 
@@ -314,38 +351,43 @@ for (const key in Memory.creeps) {
         delete Memory.creeps[key];
     }
 }
-const creepCtorMap = {
-    harvester: _harvester__WEBPACK_IMPORTED_MODULE_1__["Harvester"],
-    upgrader: _upgrader__WEBPACK_IMPORTED_MODULE_2__["Upgrader"],
-    builder: _builder__WEBPACK_IMPORTED_MODULE_0__["Builder"],
+const creepControllerMap = {
+    harvester: _harvesterController__WEBPACK_IMPORTED_MODULE_0__["HarvesterController"],
+    upgrader: _upgraderController__WEBPACK_IMPORTED_MODULE_1__["UpgraderController"],
+    builder: _builderController__WEBPACK_IMPORTED_MODULE_2__["BuilderController"],
 };
 const creepMap = new Map();
 for (const creepName in Game.creeps) {
     const creep = Game.creeps[creepName];
-    const type = creep.memory.type;
-    const handler = new creepCtorMap[type]();
-    handler.creep = creep;
-    if (creepMap.has(type)) {
-        creepMap.get(type).push(handler);
+    const list = creepMap.get(creep.memory.type);
+    if (list) {
+        list.push(creep);
     }
     else {
-        creepMap.set(type, [handler]);
+        creepMap.set(creep.memory.type, [creep]);
     }
 }
 let spawning = null;
+const spawn = Game.spawns['Home'];
 const list = ["harvester" /* Harvester */, "upgrader" /* Upgrader */, "builder" /* Builder */];
 for (let i = 0; i < list.length; i++) {
     const l = creepMap.get(list[i]);
-    if (!l) {
+    if (l) {
+        if (l.length >= 5) {
+            list.splice(i, 1);
+            i--;
+        }
+    }
+    else {
         spawning = list[i];
         break;
     }
 }
-if (spawning === null) {
+if (spawning === null && list.length > 0) {
     creepMap.forEach((creeps, type) => {
         let flag = true;
         for (let i = 0; i < creeps.length; i++) {
-            flag = creeps[i].ticker() && flag;
+            flag = creepControllerMap[creeps[i].memory.type].ticker(creeps[i]) && flag;
         }
         if (!flag) {
             const index = list.indexOf(type);
@@ -354,24 +396,37 @@ if (spawning === null) {
             }
         }
     });
-    spawning = list.length > 0 ? list[Math.floor(Math.random() * list.length)] : null;
+    spawning = Object(_util__WEBPACK_IMPORTED_MODULE_3__["RandomObjectInList"])(list);
 }
 else {
-    creepMap.forEach(creeps => creeps.forEach(creep => creep.ticker()));
+    creepMap.forEach(creeps => creeps.forEach(creep => creepControllerMap[creep.memory.type].ticker(creep)));
 }
-for (const spawnName in Game.spawns) {
-    const spawn = Game.spawns[spawnName];
-    if (spawning !== null) {
-        const ctor = creepCtorMap[spawning];
-        if (spawn.room.energyAvailable >= ctor.minEnergy) {
-            const creep = new ctor();
-            const reuslt = creep.create(spawn, spawn.room.energyAvailable);
-            if (reuslt !== OK) {
-                console.log(reuslt);
-            }
+if (spawning !== null) {
+    const controller = creepControllerMap[spawning];
+    if (spawn.room.energyAvailable >= controller.minEnergy) {
+        const name = `${spawn.name}-${Game.time}`;
+        const result = controller.create(spawn, name, spawn.room.energyAvailable);
+        if (result === OK) {
+            Game.creeps[name].memory.type = controller.type;
+        }
+        else {
+            Game.notify(`spawn object fail:${spawning} ${name} ${result}`, 60);
         }
     }
 }
+
+
+/***/ }),
+
+/***/ "./src/patch.ts":
+/*!**********************!*\
+  !*** ./src/patch.ts ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 Game.killAllCreeps = () => {
     for (const name in Game.creeps) {
         Game.creeps[name].suicide();
@@ -382,80 +437,166 @@ Game.killAllCreeps = () => {
 
 /***/ }),
 
-/***/ "./src/upgrader.ts":
+/***/ "./src/transfer.ts":
 /*!*************************!*\
-  !*** ./src/upgrader.ts ***!
+  !*** ./src/transfer.ts ***!
   \*************************/
-/*! exports provided: Upgrader */
+/*! exports provided: Transfer */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Upgrader", function() { return Upgrader; });
-/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
-var _a;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Transfer", function() { return Transfer; });
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ "./src/util.ts");
 
-const Upgrader = (_a = class Upgrader {
-        create(spawn) {
-            const name = `${spawn.name}-${Game.time}`;
-            const result = spawn.spawnCreep(['work', 'carry', 'move'], name);
-            if (result === OK) {
-                this.creep = Game.creeps[name];
-                this.creep.memory = {
-                    type: "upgrader" /* Upgrader */,
-                    upgrading: false,
-                    targetId: null,
-                };
+function Transfer(creep) {
+    let target = null;
+    if (creep.memory.transferId) {
+        target = Game.getObjectById(creep.memory.transferId);
+    }
+    if (target === null) {
+        const source = creep.room.find(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return structure.structureType === STRUCTURE_EXTENSION
+                    || structure.structureType === STRUCTURE_SPAWN
+                    || structure.structureType === STRUCTURE_TOWER
+                        && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
             }
-            return result;
+        });
+        target = Object(_util__WEBPACK_IMPORTED_MODULE_0__["RandomObjectInList"])(source);
+        if (target) {
+            creep.memory.transferId = target.id;
         }
-        ticker() {
-            if (this.creep.memory.upgrading) {
-                if (this.creep.store[RESOURCE_ENERGY] === 0) {
-                    this.creep.memory.upgrading = false;
-                }
+    }
+    if (target) {
+        if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+        }
+        creep.say('运输中');
+        return true;
+    }
+    else {
+        creep.say('闲置中');
+        return false;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/upgrade.ts":
+/*!************************!*\
+  !*** ./src/upgrade.ts ***!
+  \************************/
+/*! exports provided: Upgrade */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Upgrade", function() { return Upgrade; });
+function Upgrade(creep) {
+    if (creep.room.controller) {
+        if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
+            creep.moveTo(creep.room.controller);
+        }
+        creep.say('升级中');
+        return true;
+    }
+    else {
+        creep.say('闲置中');
+        return false;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/upgraderController.ts":
+/*!***********************************!*\
+  !*** ./src/upgraderController.ts ***!
+  \***********************************/
+/*! exports provided: UpgraderController */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UpgraderController", function() { return UpgraderController; });
+/* harmony import */ var _baseCreep__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./baseCreep */ "./src/baseCreep.ts");
+/* harmony import */ var _harvest__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./harvest */ "./src/harvest.ts");
+/* harmony import */ var _upgrade__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./upgrade */ "./src/upgrade.ts");
+/* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util */ "./src/util.ts");
+
+
+
+
+const UpgraderController = {
+    type: "upgrader" /* Upgrader */,
+    minEnergy: Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
+    create(spawn, name, maxEnergy) {
+        const body = ['work', 'carry', 'move'];
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / _baseCreep__WEBPACK_IMPORTED_MODULE_0__["EnergyMap"].carry);
+        if (maxCount > 0) {
+            const count = Object(_util__WEBPACK_IMPORTED_MODULE_3__["RandomInt"])(maxCount + 1);
+            if (count > 0) {
+                body.splice(1, 0, ...new Array(count).fill('carry'));
             }
-            else {
-                if (this.creep.store.getFreeCapacity() === 0) {
-                    this.creep.memory.upgrading = true;
-                }
+        }
+        return spawn.spawnCreep(body, name);
+    },
+    ticker(creep) {
+        var _a;
+        let upgrading = (_a = creep.memory.upgrading) !== null && _a !== void 0 ? _a : false;
+        if (upgrading) {
+            if (creep.store[RESOURCE_ENERGY] === 0) {
+                upgrading = false;
             }
-            if (this.creep.memory.upgrading) {
-                if (this.creep.upgradeController(this.creep.room.controller) === ERR_NOT_IN_RANGE) {
-                    this.creep.moveTo(this.creep.room.controller);
-                }
-                this.creep.say('升级中');
-                return true;
+        }
+        else {
+            if (creep.store.getFreeCapacity() === 0) {
+                upgrading = true;
+                delete creep.memory.harvestId;
             }
-            else {
-                let target = null;
-                if (this.creep.memory.targetId) {
-                    target = Game.getObjectById(this.creep.memory.targetId);
-                }
-                if (target === null) {
-                    const source = this.creep.room.find(FIND_SOURCES);
-                    if (source.length > 0) {
-                        target = source[Math.floor(Math.random() * source.length)];
-                        this.creep.memory.targetId = target.id;
-                    }
-                }
-                if (target) {
-                    if (this.creep.harvest(target) === ERR_NOT_IN_RANGE) {
-                        this.creep.moveTo(target);
-                    }
-                    this.creep.say('采矿中');
-                    return true;
-                }
-                else {
-                    this.creep.say('闲置中');
-                    return false;
-                }
-            }
+        }
+        if (upgrading) {
+            creep.memory.upgrading = true;
+        }
+        else {
+            delete creep.memory.upgrading;
+        }
+        if (upgrading) {
+            return Object(_upgrade__WEBPACK_IMPORTED_MODULE_2__["Upgrade"])(creep);
+        }
+        else {
+            return Object(_harvest__WEBPACK_IMPORTED_MODULE_1__["Harvest"])(creep);
         }
     },
-    _a.type = "upgrader" /* Upgrader */,
-    _a.minEnergy = Object(_baseCreep__WEBPACK_IMPORTED_MODULE_0__["GetRequiredEnergy"])(['work', 'carry', 'move']),
-    _a);
+};
+
+
+/***/ }),
+
+/***/ "./src/util.ts":
+/*!*********************!*\
+  !*** ./src/util.ts ***!
+  \*********************/
+/*! exports provided: RandomInt, RandomObjectInList */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RandomInt", function() { return RandomInt; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RandomObjectInList", function() { return RandomObjectInList; });
+function RandomInt(max, min = 0) {
+    return min + Math.floor(Math.random() * (max - min));
+}
+function RandomObjectInList(list) {
+    if (list.length > 0) {
+        return list[Math.floor(Math.random() * list.length)];
+    }
+    else {
+        return null;
+    }
+}
 
 
 /***/ })
