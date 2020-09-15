@@ -25,8 +25,8 @@ export function Withdraw(creep: Creep<Withdrawable>): boolean {
         }
         if (target === null) {
             const source = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => structure.structureType === STRUCTURE_CONTAINER
-                    || (structure.structureType === STRUCTURE_EXTENSION && structure.my)
+                filter: (structure) => (structure.structureType === STRUCTURE_CONTAINER
+                    || (structure.structureType === STRUCTURE_EXTENSION && structure.my))
                     && structure.store.energy > 0
             })
             target = RandomObjectInList(source)

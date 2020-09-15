@@ -15,12 +15,12 @@ export function Transfer(creep: Creep<Transferable>): boolean {
     if (target === null) {
         const source = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {
-                return structure.structureType === STRUCTURE_CONTAINER
+                return (structure.structureType === STRUCTURE_CONTAINER
                     || (structure.structureType === STRUCTURE_SPAWN
                         || structure.structureType === STRUCTURE_TOWER
                         || structure.structureType === STRUCTURE_EXTENSION
-                        && structure.my)
-                    && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                        && structure.my))
+                    && (structure as StructureSpawn | StructureTower | StructureExtension).store.getFreeCapacity(RESOURCE_ENERGY) > 0
             }
         })
         target = RandomObjectInList(source)
