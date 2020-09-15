@@ -8,6 +8,9 @@ export function Transfer(creep: Creep<Transferable>): boolean {
     let target: AnyStructure | null = null
     if (creep.memory.transferId) {
         target = Game.getObjectById(creep.memory.transferId)
+        if (target && (target as StructureSpawn | StructureTower | StructureExtension).store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+            target = null
+        }
     }
     if (target === null) {
         const source = creep.room.find(FIND_STRUCTURES, {

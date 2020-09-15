@@ -8,6 +8,9 @@ export function Withdraw(creep: Creep<Withdrawable>): boolean {
     let target: Tombstone | Ruin | Structure | null = null
     if (creep.memory.withdrawId) {
         target = Game.getObjectById(creep.memory.withdrawId)
+        if (target && (target as Ruin | Tombstone | StructureContainer | StructureExtension).store.energy === 0) {
+            target = null
+        }
     }
     if (target === null) {
         const source = creep.room.find(FIND_RUINS, {
@@ -36,7 +39,7 @@ export function Withdraw(creep: Creep<Withdrawable>): boolean {
         if (creep.withdraw(target, 'energy') === ERR_NOT_IN_RANGE) {
             creep.moveTo(target)
         }
-        creep.say('建造中')
+        creep.say('提取中')
         return true
     } else {
         creep.say('闲置中')

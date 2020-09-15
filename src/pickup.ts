@@ -19,7 +19,7 @@ export function Pickup(creep: Creep<Pickupable>): boolean {
         if (creep.pickup(target) === ERR_NOT_IN_RANGE) {
             creep.moveTo(target)
         }
-        creep.say('采集中')
+        creep.say('捡起中')
         return true
     } else {
         creep.say('闲置中')

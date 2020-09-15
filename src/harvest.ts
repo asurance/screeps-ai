@@ -19,7 +19,7 @@ export function Harvest(creep: Creep<Harvestable>): boolean {
         if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
             creep.moveTo(target)
         }
-        creep.say('采集中')
+        creep.say('收获中')
         return true
     } else {
         creep.say('闲置中')
