@@ -1,3 +1,11 @@
+interface Memory {
+    harvester?: number
+    transfer?: number
+    upgrader?: number
+    builder?: number
+    repairer?: number
+}
+
 interface Creep<T extends MemoryData = MemoryData> {
     memory: T
 }

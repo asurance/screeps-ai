@@ -7,12 +7,6 @@ import { RandomObjectInList } from './util'
 import './patch'
 import { TransferController } from './transferController'
 
-for (const key in Memory.creeps) {
-    if (!(key in Game.creeps)) {
-        delete Memory.creeps[key]
-    }
-}
-
 const creepControllerMap: { [key in CreepType]: CreepController<CreepType> } = {
     harvester: HarvesterController,
     transfer: TransferController,
@@ -23,6 +17,14 @@ const creepControllerMap: { [key in CreepType]: CreepController<CreepType> } = {
 
 const creepMap = new Map<CreepType, Creep[]>()
 
+// 删除过期数据
+for (const key in Memory.creeps) {
+    if (!(key in Game.creeps)) {
+        delete Memory.creeps[key]
+    }
+}
+
+// 数据预处理
 for (const creepName in Game.creeps) {
     const creep = Game.creeps[creepName] as Creep<MemoryData>
     const list = creepMap.get(creep.memory.type)
@@ -37,6 +39,7 @@ let spawning: CreepType | null = null
 
 const spawn = Game.spawns['Home']
 
+// 塔设置
 const towers = spawn.room.find(FIND_STRUCTURES, {
     filter: (structure) => structure.structureType === STRUCTURE_TOWER
         && structure.my
@@ -50,6 +53,7 @@ towers.forEach(tower => {
 
 const list = [CreepType.Harvester, CreepType.Transfer, CreepType.Upgrader, CreepType.Builder, CreepType.Repairer]
 
+// 最少生成一项
 for (let i = 0; i < list.length; i++) {
     const l = creepMap.get(list[i])
     if (l) {
@@ -62,28 +66,34 @@ for (let i = 0; i < list.length; i++) {
         break
     }
 }
-if (spawning === null && list.length > 0) {
-    creepMap.forEach((creeps, type) => {
-        let flag = true
-        for (let i = 0; i < creeps.length; i++) {
-            flag = creepControllerMap[creeps[i].memory.type].ticker(creeps[i]) && flag
+// 操作并且对闲置计数
+creepMap.forEach((creeps, type) => {
+    let count = Math.max(Memory[type] ?? 0 - 4, 0)
+    for (let i = 0; i < creeps.length; i++) {
+        const tick = creepControllerMap[creeps[i].memory.type].ticker(creeps[i])
+        if (!tick) {
+            count++
         }
-        if (!flag) {
-            const index = list.indexOf(type)
-            if (index >= 0) {
-                list.splice(index, 1)
-            }
+    }
+    if (count <= 0) {
+        delete Memory[type]
+    } else {
+        Memory[type] = count
+        const index = list.indexOf(type)
+        if (index >= 0) {
+            list.splice(index, 1)
         }
-    })
-    spawning = RandomObjectInList(list)
-} else {
-    creepMap.forEach(creeps => creeps.forEach(creep => creepControllerMap[creep.memory.type].ticker(creep)))
-}
+    }
+})
 
+// 生成新creeps
+if (spawning === null) {
+    spawning = RandomObjectInList(list)
+}
 if (spawning !== null) {
     const controller = creepControllerMap[spawning]
     if (spawn.room.energyAvailable >= controller.minEnergy) {
-        const name = `${spawn.name}-${Game.time}`
+        const name = `${spawning}-${spawn.name}-${Game.time}`
         const result = controller.create(spawn, name, spawn.room.energyAvailable)
         if (result === OK) {
             Game.creeps[name].memory.type = controller.type
