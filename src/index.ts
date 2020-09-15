@@ -68,7 +68,7 @@ for (let i = 0; i < list.length; i++) {
 }
 // 操作并且对闲置计数
 creepMap.forEach((creeps, type) => {
-    let count = Math.max(Memory[type] ?? 0 - 4, 0)
+    let count = Math.max((Memory[type] ?? 0) - 4, 0)
     for (let i = 0; i < creeps.length; i++) {
         const tick = creepControllerMap[creeps[i].memory.type].ticker(creeps[i])
         if (!tick) {
