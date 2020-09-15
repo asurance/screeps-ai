@@ -1,12 +1,12 @@
-import { CreepController, EnergyMap, GetRequiredEnergy } from './creepController'
-import { Harvest } from './harvest'
+import { CreepController, GetRequiredEnergy } from './creepController'
 import { Upgrade } from './upgrade'
 import { RandomInt } from './util'
+import { Withdraw } from './withdraw'
 
 interface Data extends MemoryData {
     type: CreepType.Upgrader
     upgrading?: boolean
-    harvestId?: Id<Source>
+    withdrawId?: Id<Tombstone | Ruin | Structure>
 }
 
 export const UpgraderController: CreepController<CreepType.Upgrader> = {
@@ -17,7 +17,7 @@ export const UpgraderController: CreepController<CreepType.Upgrader> = {
 
     create(spawn: StructureSpawn, name: string, maxEnergy: number) {
         const body = ['work', 'carry', 'move'] as BodyPartConstant[]
-        const maxCount = Math.floor((maxEnergy - this.minEnergy) / EnergyMap.carry)
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.carry)
         if (maxCount > 0) {
             const count = RandomInt(maxCount + 1)
             if (count > 0) {
@@ -36,7 +36,7 @@ export const UpgraderController: CreepController<CreepType.Upgrader> = {
         } else {
             if (creep.store.getFreeCapacity() === 0) {
                 upgrading = true
-                delete creep.memory.harvestId
+                delete creep.memory.withdrawId
             }
         }
         if (upgrading) {
@@ -47,7 +47,7 @@ export const UpgraderController: CreepController<CreepType.Upgrader> = {
         if (upgrading) {
             return Upgrade(creep)
         } else {
-            return Harvest(creep)
+            return Withdraw(creep)
         }
     },
 } 

@@ -1,12 +1,12 @@
-import { CreepController, EnergyMap, GetRequiredEnergy } from './creepController'
+import { CreepController, GetRequiredEnergy } from './creepController'
 import { Build } from './build'
-import { Harvest } from './harvest'
 import { RandomInt } from './util'
+import { Withdraw } from './withdraw'
 
 interface Data extends MemoryData {
     type: CreepType.Builder
     building?: boolean
-    harvestId?: Id<Source>
+    withdrawId?: Id<Tombstone | Ruin | Structure>
     buildId?: Id<ConstructionSite<BuildableStructureConstant>>
 }
 
@@ -18,7 +18,7 @@ export const BuilderController: CreepController<CreepType.Builder> = {
 
     create(spawn: StructureSpawn, name: string, maxEnergy: number) {
         const body = ['work', 'carry', 'move'] as BodyPartConstant[]
-        const maxCount = Math.floor((maxEnergy - this.minEnergy) / EnergyMap.carry)
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.carry)
         if (maxCount > 0) {
             const count = RandomInt(maxCount + 1)
             if (count > 0) {
@@ -27,7 +27,7 @@ export const BuilderController: CreepController<CreepType.Builder> = {
         }
         return spawn.spawnCreep(body, name)
     },
-    
+
     ticker(creep: Creep<Data>) {
         let building = creep.memory.building ?? false
         if (building) {
@@ -38,7 +38,7 @@ export const BuilderController: CreepController<CreepType.Builder> = {
         } else {
             if (creep.store.getFreeCapacity() === 0) {
                 building = true
-                delete creep.memory.harvestId
+                delete creep.memory.withdrawId
             }
         }
         if (building) {
@@ -50,7 +50,7 @@ export const BuilderController: CreepController<CreepType.Builder> = {
             return Build(creep)
         }
         else {
-            return Harvest(creep)
+            return Withdraw(creep)
         }
     },
 } 

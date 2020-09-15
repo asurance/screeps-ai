@@ -5,6 +5,7 @@ import { BuilderController } from './builderController'
 import { RepairController } from './repairerController'
 import { RandomObjectInList } from './util'
 import './patch'
+import { TransferController } from './transferController'
 
 for (const key in Memory.creeps) {
     if (!(key in Game.creeps)) {
@@ -14,6 +15,7 @@ for (const key in Memory.creeps) {
 
 const creepControllerMap: { [key in CreepType]: CreepController<CreepType> } = {
     harvester: HarvesterController,
+    transfer: TransferController,
     upgrader: UpgraderController,
     builder: BuilderController,
     repairer: RepairController,
@@ -35,11 +37,23 @@ let spawning: CreepType | null = null
 
 const spawn = Game.spawns['Home']
 
-const list = [CreepType.Harvester, CreepType.Upgrader, CreepType.Builder]
+const towers = spawn.room.find(FIND_STRUCTURES, {
+    filter: (structure) => structure.structureType === STRUCTURE_TOWER
+        && structure.my
+}) as StructureTower[]
+towers.forEach(tower => {
+    const hostTile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS)
+    if (hostTile) {
+        hostTile.attack(hostTile)
+    }
+})
+
+const list = [CreepType.Harvester, CreepType.Transfer, CreepType.Upgrader, CreepType.Builder, CreepType.Repairer]
+
 for (let i = 0; i < list.length; i++) {
     const l = creepMap.get(list[i])
     if (l) {
-        if (l.length >= 5) {
+        if (l.length >= 4) {
             list.splice(i, 1)
             i--
         }

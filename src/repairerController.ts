@@ -1,12 +1,12 @@
-import { CreepController, EnergyMap, GetRequiredEnergy } from './creepController'
-import { Harvest } from './harvest'
+import { CreepController, GetRequiredEnergy } from './creepController'
 import { RandomInt } from './util'
 import { Repair } from './repair'
+import { Withdraw } from './withdraw'
 
 interface Data extends MemoryData {
     type: CreepType.Repairer
     repairing?: boolean
-    harvestId?: Id<Source>
+    withdrawId?: Id<Tombstone | Ruin | Structure>
     repairId?: Id<Structure>
     repairTick?: number
 }
@@ -19,7 +19,7 @@ export const RepairController: CreepController<CreepType.Repairer> = {
 
     create(spawn: StructureSpawn, name: string, maxEnergy: number) {
         const body = ['work', 'carry', 'move'] as BodyPartConstant[]
-        const maxCount = Math.floor((maxEnergy - this.minEnergy) / EnergyMap.carry)
+        const maxCount = Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.carry)
         if (maxCount > 0) {
             const count = RandomInt(maxCount + 1)
             if (count > 0) {
@@ -48,7 +48,7 @@ export const RepairController: CreepController<CreepType.Repairer> = {
         } else {
             if (creep.store.getFreeCapacity() === 0) {
                 repairing = true
-                delete creep.memory.harvestId
+                delete creep.memory.withdrawId
             }
         }
         if (repairing) {
@@ -60,7 +60,7 @@ export const RepairController: CreepController<CreepType.Repairer> = {
             return Repair(creep)
         }
         else {
-            return Harvest(creep)
+            return Withdraw(creep)
         }
     },
 } 

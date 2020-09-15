@@ -6,12 +6,9 @@ interface MemoryData<T extends Creeptype = CreepType> extends CreepMemory {
     type: T
 }
 
-interface Game {
-    killAllCreeps(): void
-}
-
 const enum CreepType {
     Harvester = 'harvester',
+    Transfer = 'transfer',
     Upgrader = 'upgrader',
     Builder = 'builder',
     Repairer = 'repairer',

@@ -1,8 +1,8 @@
-interface Buildable extends MemoryData {
+interface Repairable extends MemoryData {
     repairId?: Id<Structure>
 }
 
-export function Repair(creep: Creep<Buildable>): boolean {
+export function Repair(creep: Creep<Repairable>): boolean {
     let target: Structure | null = null
     if (creep.memory.repairId) {
         target = Game.getObjectById(creep.memory.repairId)

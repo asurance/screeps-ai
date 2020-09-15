@@ -8,7 +8,7 @@ export function Build(creep: Creep<Buildable>): boolean {
         target = Game.getObjectById(creep.memory.buildId)
     }
     if (target === null) {
-        const source = creep.room.find(FIND_CONSTRUCTION_SITES)
+        const source = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
         if (source.length > 0) {
             target = source.reduce((pre, cur) => {
                 if ((pre.progress + 1) / pre.progressTotal < (cur.progress + 1) / cur.progressTotal) {
