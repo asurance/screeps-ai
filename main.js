@@ -474,6 +474,9 @@ function Repair(creep) {
     let target = null;
     if (creep.memory.repairId) {
         target = Game.getObjectById(creep.memory.repairId);
+        if (target && (target.hits === target.hitsMax)) {
+            target = null;
+        }
     }
     if (target === null) {
         const source = creep.room.find(FIND_STRUCTURES, {
