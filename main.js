@@ -243,7 +243,7 @@ function Harvest(creep) {
         if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
             creep.moveTo(target);
         }
-        creep.say('采集中');
+        creep.say('收获中');
         return true;
     }
     else {
@@ -448,7 +448,7 @@ function Pickup(creep) {
         if (creep.pickup(target) === ERR_NOT_IN_RANGE) {
             creep.moveTo(target);
         }
-        creep.say('采集中');
+        creep.say('捡起中');
         return true;
     }
     else {
@@ -601,6 +601,9 @@ function Transfer(creep) {
     let target = null;
     if (creep.memory.transferId) {
         target = Game.getObjectById(creep.memory.transferId);
+        if (target && target.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+            target = null;
+        }
     }
     if (target === null) {
         const source = creep.room.find(FIND_STRUCTURES, {
@@ -832,6 +835,9 @@ function Withdraw(creep) {
     let target = null;
     if (creep.memory.withdrawId) {
         target = Game.getObjectById(creep.memory.withdrawId);
+        if (target && target.store.energy === 0) {
+            target = null;
+        }
     }
     if (target === null) {
         const source = creep.room.find(FIND_RUINS, {
@@ -860,7 +866,7 @@ function Withdraw(creep) {
         if (creep.withdraw(target, 'energy') === ERR_NOT_IN_RANGE) {
             creep.moveTo(target);
         }
-        creep.say('建造中');
+        creep.say('提取中');
         return true;
     }
     else {
