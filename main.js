@@ -622,12 +622,12 @@ function Transfer(creep) {
     if (target === null) {
         const source = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {
-                return structure.structureType === STRUCTURE_CONTAINER
+                return (structure.structureType === STRUCTURE_CONTAINER
                     || (structure.structureType === STRUCTURE_SPAWN
                         || structure.structureType === STRUCTURE_TOWER
                         || structure.structureType === STRUCTURE_EXTENSION
-                            && structure.my)
-                        && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                            && structure.my))
+                    && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
             }
         });
         target = Object(_util__WEBPACK_IMPORTED_MODULE_0__["RandomObjectInList"])(source);
@@ -866,9 +866,9 @@ function Withdraw(creep) {
         }
         if (target === null) {
             const source = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => structure.structureType === STRUCTURE_CONTAINER
-                    || (structure.structureType === STRUCTURE_EXTENSION && structure.my)
-                        && structure.store.energy > 0
+                filter: (structure) => (structure.structureType === STRUCTURE_CONTAINER
+                    || (structure.structureType === STRUCTURE_EXTENSION && structure.my))
+                    && structure.store.energy > 0
             });
             target = Object(_util__WEBPACK_IMPORTED_MODULE_0__["RandomObjectInList"])(source);
         }
