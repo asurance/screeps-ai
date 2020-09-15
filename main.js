@@ -317,11 +317,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-for (const key in Memory.creeps) {
-    if (!(key in Game.creeps)) {
-        delete Memory.creeps[key];
-    }
-}
 const creepControllerMap = {
     harvester: _harvesterController__WEBPACK_IMPORTED_MODULE_0__["HarvesterController"],
     transfer: _transferController__WEBPACK_IMPORTED_MODULE_6__["TransferController"],
@@ -330,6 +325,13 @@ const creepControllerMap = {
     repairer: _repairerController__WEBPACK_IMPORTED_MODULE_3__["RepairController"],
 };
 const creepMap = new Map();
+// 删除过期数据
+for (const key in Memory.creeps) {
+    if (!(key in Game.creeps)) {
+        delete Memory.creeps[key];
+    }
+}
+// 数据预处理
 for (const creepName in Game.creeps) {
     const creep = Game.creeps[creepName];
     const list = creepMap.get(creep.memory.type);
@@ -342,6 +344,7 @@ for (const creepName in Game.creeps) {
 }
 let spawning = null;
 const spawn = Game.spawns['Home'];
+// 塔设置
 const towers = spawn.room.find(FIND_STRUCTURES, {
     filter: (structure) => structure.structureType === STRUCTURE_TOWER
         && structure.my
@@ -353,6 +356,7 @@ towers.forEach(tower => {
     }
 });
 const list = ["harvester" /* Harvester */, "transfer" /* Transfer */, "upgrader" /* Upgrader */, "builder" /* Builder */, "repairer" /* Repairer */];
+// 最少生成一项
 for (let i = 0; i < list.length; i++) {
     const l = creepMap.get(list[i]);
     if (l) {
@@ -366,28 +370,35 @@ for (let i = 0; i < list.length; i++) {
         break;
     }
 }
-if (spawning === null && list.length > 0) {
-    creepMap.forEach((creeps, type) => {
-        let flag = true;
-        for (let i = 0; i < creeps.length; i++) {
-            flag = creepControllerMap[creeps[i].memory.type].ticker(creeps[i]) && flag;
+// 操作并且对闲置计数
+creepMap.forEach((creeps, type) => {
+    var _a;
+    let count = Math.max((_a = Memory[type]) !== null && _a !== void 0 ? _a : 0 - 4, 0);
+    for (let i = 0; i < creeps.length; i++) {
+        const tick = creepControllerMap[creeps[i].memory.type].ticker(creeps[i]);
+        if (!tick) {
+            count++;
         }
-        if (!flag) {
-            const index = list.indexOf(type);
-            if (index >= 0) {
-                list.splice(index, 1);
-            }
+    }
+    if (count <= 0) {
+        delete Memory[type];
+    }
+    else {
+        Memory[type] = count;
+        const index = list.indexOf(type);
+        if (index >= 0) {
+            list.splice(index, 1);
         }
-    });
+    }
+});
+// 生成新creeps
+if (spawning === null) {
     spawning = Object(_util__WEBPACK_IMPORTED_MODULE_4__["RandomObjectInList"])(list);
-}
-else {
-    creepMap.forEach(creeps => creeps.forEach(creep => creepControllerMap[creep.memory.type].ticker(creep)));
 }
 if (spawning !== null) {
     const controller = creepControllerMap[spawning];
     if (spawn.room.energyAvailable >= controller.minEnergy) {
-        const name = `${spawn.name}-${Game.time}`;
+        const name = `${spawning}-${spawn.name}-${Game.time}`;
         const result = controller.create(spawn, name, spawn.room.energyAvailable);
         if (result === OK) {
             Game.creeps[name].memory.type = controller.type;
