@@ -4,7 +4,7 @@ interface Withdrawable extends MemoryData {
     withdrawId?: Id<Tombstone | Ruin | Structure>
 }
 
-export function Withdraw(creep: Creep<Withdrawable>): boolean {
+export function Withdraw(creep: Creep<Withdrawable>): number {
     let target: Tombstone | Ruin | Structure | null = null
     if (creep.memory.withdrawId) {
         target = Game.getObjectById(creep.memory.withdrawId)
@@ -37,12 +37,13 @@ export function Withdraw(creep: Creep<Withdrawable>): boolean {
     }
     if (target) {
         if (creep.withdraw(target, 'energy') === ERR_NOT_IN_RANGE) {
+            creep.say('提取中')
             creep.moveTo(target)
+            return 0
+        } else {
+            return -2
         }
-        creep.say('提取中')
-        return true
     } else {
-        creep.say('闲置中')
-        return false
+        return 10
     }
 }

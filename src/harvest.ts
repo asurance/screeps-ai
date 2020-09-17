@@ -3,7 +3,7 @@ import { RandomObjectInList } from './util'
 interface Harvestable extends MemoryData {
     harvestId?: Id<Source>
 }
-export function Harvest(creep: Creep<Harvestable>): boolean {
+export function Harvest(creep: Creep<Harvestable>): number {
     let target: Source | null = null
     if (creep.memory.harvestId) {
         target = Game.getObjectById(creep.memory.harvestId)
@@ -17,12 +17,14 @@ export function Harvest(creep: Creep<Harvestable>): boolean {
     }
     if (target) {
         if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
+            creep.say('收获中')
             creep.moveTo(target)
+            return 1
+        } else {
+            return -2
         }
-        creep.say('收获中')
-        return true
     } else {
         creep.say('闲置中')
-        return false
+        return 10
     }
 }

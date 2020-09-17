@@ -2,7 +2,7 @@ interface Buildable extends MemoryData {
     buildId?: Id<ConstructionSite>
 }
 
-export function Build(creep: Creep<Buildable>): boolean {
+export function Build(creep: Creep<Buildable>): number {
     let target: ConstructionSite<BuildableStructureConstant> | null = null
     if (creep.memory.buildId) {
         target = Game.getObjectById(creep.memory.buildId)
@@ -22,12 +22,14 @@ export function Build(creep: Creep<Buildable>): boolean {
     }
     if (target) {
         if (creep.build(target) === ERR_NOT_IN_RANGE) {
+            creep.say('建造中')
             creep.moveTo(target)
+            return 0
+        } else {
+            return -2
         }
-        creep.say('建造中')
-        return true
     } else {
         creep.say('闲置中')
-        return false
+        return 10
     }
 }

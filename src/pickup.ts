@@ -3,7 +3,7 @@ import { RandomObjectInList } from './util'
 interface Pickupable extends MemoryData {
     pickupId?: Id<Resource>
 }
-export function Pickup(creep: Creep<Pickupable>): boolean {
+export function Pickup(creep: Creep<Pickupable>): number {
     let target: Resource | null = null
     if (creep.memory.pickupId) {
         target = Game.getObjectById(creep.memory.pickupId)
@@ -17,12 +17,14 @@ export function Pickup(creep: Creep<Pickupable>): boolean {
     }
     if (target) {
         if (creep.pickup(target) === ERR_NOT_IN_RANGE) {
+            creep.say('捡起中')
             creep.moveTo(target)
+            return -1
+        } else {
+            return -1
         }
-        creep.say('捡起中')
-        return true
     } else {
         creep.say('闲置中')
-        return false
+        return 10
     }
 }

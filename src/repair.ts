@@ -2,7 +2,7 @@ interface Repairable extends MemoryData {
     repairId?: Id<Structure>
 }
 
-export function Repair(creep: Creep<Repairable>): boolean {
+export function Repair(creep: Creep<Repairable>): number {
     let target: Structure | null = null
     if (creep.memory.repairId) {
         target = Game.getObjectById(creep.memory.repairId)
@@ -29,12 +29,14 @@ export function Repair(creep: Creep<Repairable>): boolean {
     }
     if (target) {
         if (creep.repair(target) === ERR_NOT_IN_RANGE) {
+            creep.say('维修中')
             creep.moveTo(target)
+            return 0
+        } else {
+            return -2
         }
-        creep.say('维修中')
-        return true
     } else {
         creep.say('闲置中')
-        return false
+        return 10
     }
 }

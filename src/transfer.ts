@@ -4,7 +4,7 @@ interface Transferable extends MemoryData {
     transferId?: Id<AnyStructure>
 }
 
-export function Transfer(creep: Creep<Transferable>): boolean {
+export function Transfer(creep: Creep<Transferable>): number {
     let target: AnyStructure | null = null
     if (creep.memory.transferId) {
         target = Game.getObjectById(creep.memory.transferId)
@@ -30,12 +30,14 @@ export function Transfer(creep: Creep<Transferable>): boolean {
     }
     if (target) {
         if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+            creep.say('运输中')
             creep.moveTo(target)
+            return 0
+        } else {
+            return -2
         }
-        creep.say('运输中')
-        return true
     } else {
         creep.say('闲置中')
-        return false
+        return 10
     }
 }

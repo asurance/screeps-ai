@@ -8,5 +8,5 @@ export interface CreepController<T extends CreepType = CreepType> {
     readonly type: T
     readonly minEnergy: number
     create(spawn: StructureSpawn, name: string, maxEnergy: number): ScreepsReturnCode
-    ticker(creep: Creep<MemoryData<T>>): boolean
+    ticker(creep: Creep<MemoryData<T>>): number
 }

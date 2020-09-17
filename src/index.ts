@@ -57,7 +57,7 @@ const list = [CreepType.Harvester, CreepType.Transfer, CreepType.Upgrader, Creep
 for (let i = 0; i < list.length; i++) {
     const l = creepMap.get(list[i])
     if (l) {
-        if (l.length >= 4) {
+        if (l.length >= 10) {
             list.splice(i, 1)
             i--
         }
@@ -68,12 +68,9 @@ for (let i = 0; i < list.length; i++) {
 }
 // 操作并且对闲置计数
 creepMap.forEach((creeps, type) => {
-    let count = Math.max((Memory[type] ?? 0) - 4, 0)
+    let count = Memory[type] ?? 0
     for (let i = 0; i < creeps.length; i++) {
-        const tick = creepControllerMap[creeps[i].memory.type].ticker(creeps[i])
-        if (!tick) {
-            count++
-        }
+        count += creepControllerMap[creeps[i].memory.type].ticker(creeps[i])
     }
     if (count <= 0) {
         delete Memory[type]
