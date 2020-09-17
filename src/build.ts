@@ -1,4 +1,4 @@
-interface Buildable extends MemoryData {
+interface Buildable extends CreepMemoryData {
     buildId?: Id<ConstructionSite>
 }
 

@@ -1,6 +1,6 @@
 import { RandomObjectInList } from './util'
 
-interface Harvestable extends MemoryData {
+interface Harvestable extends CreepMemoryData {
     harvestId?: Id<Source>
     harvestTicker?: number
 }

@@ -1,6 +1,6 @@
 import { RandomObjectInList } from './util'
 
-interface Withdrawable extends MemoryData {
+interface Withdrawable extends CreepMemoryData {
     withdrawId?: Id<Tombstone | Ruin | Structure>
 }
 

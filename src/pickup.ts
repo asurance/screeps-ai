@@ -1,6 +1,6 @@
 import { RandomObjectInList } from './util'
 
-interface Pickupable extends MemoryData {
+interface Pickupable extends CreepMemoryData {
     pickupId?: Id<Resource>
 }
 export function Pickup(creep: Creep<Pickupable>): number {

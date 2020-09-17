@@ -2,7 +2,7 @@ import { CreepController, GetRequiredEnergy } from './creepController'
 import { Harvest } from './harvest'
 import { RandomInt } from './util'
 
-interface Data extends MemoryData {
+interface Data extends CreepMemoryData {
     type: CreepType.Harvester
     harvestId?: Id<Source>
 }

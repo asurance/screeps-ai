@@ -6,11 +6,11 @@ interface Memory {
     repairer?: number
 }
 
-interface Creep<T extends MemoryData = MemoryData> {
+interface Creep<T extends CreepMemoryData = CreepMemoryData> {
     memory: T
 }
 
-interface MemoryData<T extends Creeptype = CreepType> extends CreepMemory {
+interface CreepMemoryData<T extends Creeptype = CreepType> extends CreepMemory {
     type: T
 }
 

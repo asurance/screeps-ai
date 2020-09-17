@@ -1,4 +1,4 @@
-interface Repairable extends MemoryData {
+interface Repairable extends CreepMemoryData {
     repairId?: Id<Structure>
 }
 

@@ -1,6 +1,6 @@
 import { RandomObjectInList } from './util'
 
-interface Transferable extends MemoryData {
+interface Transferable extends CreepMemoryData {
     transferId?: Id<AnyStructure>
 }
 

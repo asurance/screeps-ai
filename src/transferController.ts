@@ -3,7 +3,7 @@ import { Transfer } from './transfer'
 import { Pickup } from './pickup'
 import { RandomInt } from './util'
 
-interface Data extends MemoryData {
+interface Data extends CreepMemoryData {
     type: CreepType.Transfer
     transfering?: boolean
     pickupId?: Id<Resource>

@@ -3,7 +3,7 @@ import { RandomInt } from './util'
 import { Repair } from './repair'
 import { Withdraw } from './withdraw'
 
-interface Data extends MemoryData {
+interface Data extends CreepMemoryData {
     type: CreepType.Repairer
     repairing?: boolean
     withdrawId?: Id<Tombstone | Ruin | Structure>

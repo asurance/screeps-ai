@@ -3,7 +3,7 @@ import { Build } from './build'
 import { RandomInt } from './util'
 import { Withdraw } from './withdraw'
 
-interface Data extends MemoryData {
+interface Data extends CreepMemoryData {
     type: CreepType.Builder
     building?: boolean
     withdrawId?: Id<Tombstone | Ruin | Structure>
