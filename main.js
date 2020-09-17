@@ -117,11 +117,11 @@ function Build(creep) {
     }
     if (target) {
         if (creep.build(target) === ERR_NOT_IN_RANGE) {
-            creep.say('建造中');
             creep.moveTo(target);
             return 0;
         }
         else {
+            creep.say('建造中');
             return -2;
         }
     }
@@ -265,11 +265,11 @@ function Harvest(creep) {
     }
     if (target) {
         if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
-            creep.say('收获中');
             creep.moveTo(target);
             return 2;
         }
         else {
+            creep.say('收获中');
             return -2;
         }
     }
@@ -482,11 +482,11 @@ function Pickup(creep) {
     }
     if (target) {
         if (creep.pickup(target) === ERR_NOT_IN_RANGE) {
-            creep.say('捡起中');
             creep.moveTo(target);
             return -1;
         }
         else {
+            creep.say('捡起中');
             return -1;
         }
     }
@@ -537,11 +537,11 @@ function Repair(creep) {
     }
     if (target) {
         if (creep.repair(target) === ERR_NOT_IN_RANGE) {
-            creep.say('维修中');
             creep.moveTo(target);
             return 0;
         }
         else {
+            creep.say('维修中');
             return -2;
         }
     }
@@ -668,11 +668,11 @@ function Transfer(creep) {
     }
     if (target) {
         if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-            creep.say('运输中');
             creep.moveTo(target);
             return -1;
         }
         else {
+            creep.say('运输中');
             return -1;
         }
     }
@@ -763,11 +763,11 @@ __webpack_require__.r(__webpack_exports__);
 function Upgrade(creep) {
     if (creep.room.controller) {
         if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
-            creep.say('升级中');
             creep.moveTo(creep.room.controller);
             return 0;
         }
         else {
+            creep.say('升级中');
             return -2;
         }
     }
@@ -915,11 +915,11 @@ function Withdraw(creep) {
     }
     if (target) {
         if (creep.withdraw(target, 'energy') === ERR_NOT_IN_RANGE) {
-            creep.say('提取中');
             creep.moveTo(target);
             return 0;
         }
         else {
+            creep.say('提取中');
             return -2;
         }
     }
