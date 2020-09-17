@@ -246,7 +246,7 @@ function Harvest(creep) {
         if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
             creep.say('收获中');
             creep.moveTo(target);
-            return 1;
+            return 2;
         }
         else {
             return -2;
