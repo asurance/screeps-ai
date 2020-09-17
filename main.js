@@ -117,14 +117,17 @@ function Build(creep) {
     }
     if (target) {
         if (creep.build(target) === ERR_NOT_IN_RANGE) {
+            creep.say('建造中');
             creep.moveTo(target);
+            return 0;
         }
-        creep.say('建造中');
-        return true;
+        else {
+            return -2;
+        }
     }
     else {
         creep.say('闲置中');
-        return false;
+        return 10;
     }
 }
 
@@ -241,14 +244,17 @@ function Harvest(creep) {
     }
     if (target) {
         if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
+            creep.say('收获中');
             creep.moveTo(target);
+            return 1;
         }
-        creep.say('收获中');
-        return true;
+        else {
+            return -2;
+        }
     }
     else {
         creep.say('闲置中');
-        return false;
+        return 10;
     }
 }
 
@@ -360,7 +366,7 @@ const list = ["harvester" /* Harvester */, "transfer" /* Transfer */, "upgrader"
 for (let i = 0; i < list.length; i++) {
     const l = creepMap.get(list[i]);
     if (l) {
-        if (l.length >= 4) {
+        if (l.length >= 10) {
             list.splice(i, 1);
             i--;
         }
@@ -373,12 +379,9 @@ for (let i = 0; i < list.length; i++) {
 // 操作并且对闲置计数
 creepMap.forEach((creeps, type) => {
     var _a;
-    let count = Math.max(((_a = Memory[type]) !== null && _a !== void 0 ? _a : 0) - 4, 0);
+    let count = (_a = Memory[type]) !== null && _a !== void 0 ? _a : 0;
     for (let i = 0; i < creeps.length; i++) {
-        const tick = creepControllerMap[creeps[i].memory.type].ticker(creeps[i]);
-        if (!tick) {
-            count++;
-        }
+        count += creepControllerMap[creeps[i].memory.type].ticker(creeps[i]);
     }
     if (count <= 0) {
         delete Memory[type];
@@ -457,14 +460,17 @@ function Pickup(creep) {
     }
     if (target) {
         if (creep.pickup(target) === ERR_NOT_IN_RANGE) {
+            creep.say('捡起中');
             creep.moveTo(target);
+            return -1;
         }
-        creep.say('捡起中');
-        return true;
+        else {
+            return -1;
+        }
     }
     else {
         creep.say('闲置中');
-        return false;
+        return 10;
     }
 }
 
@@ -509,14 +515,17 @@ function Repair(creep) {
     }
     if (target) {
         if (creep.repair(target) === ERR_NOT_IN_RANGE) {
+            creep.say('维修中');
             creep.moveTo(target);
+            return 0;
         }
-        creep.say('维修中');
-        return true;
+        else {
+            return -2;
+        }
     }
     else {
         creep.say('闲置中');
-        return false;
+        return 10;
     }
 }
 
@@ -637,14 +646,17 @@ function Transfer(creep) {
     }
     if (target) {
         if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+            creep.say('运输中');
             creep.moveTo(target);
+            return 0;
         }
-        creep.say('运输中');
-        return true;
+        else {
+            return -2;
+        }
     }
     else {
         creep.say('闲置中');
-        return false;
+        return 10;
     }
 }
 
@@ -729,14 +741,17 @@ __webpack_require__.r(__webpack_exports__);
 function Upgrade(creep) {
     if (creep.room.controller) {
         if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
+            creep.say('升级中');
             creep.moveTo(creep.room.controller);
+            return 0;
         }
-        creep.say('升级中');
-        return true;
+        else {
+            return -2;
+        }
     }
     else {
         creep.say('闲置中');
-        return false;
+        return 10;
     }
 }
 
@@ -878,14 +893,16 @@ function Withdraw(creep) {
     }
     if (target) {
         if (creep.withdraw(target, 'energy') === ERR_NOT_IN_RANGE) {
+            creep.say('提取中');
             creep.moveTo(target);
+            return 0;
         }
-        creep.say('提取中');
-        return true;
+        else {
+            return -2;
+        }
     }
     else {
-        creep.say('闲置中');
-        return false;
+        return 10;
     }
 }
 
