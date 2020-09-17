@@ -32,9 +32,9 @@ export function Transfer(creep: Creep<Transferable>): number {
         if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
             creep.say('运输中')
             creep.moveTo(target)
-            return 0
+            return -1
         } else {
-            return -2
+            return -1
         }
     } else {
         creep.say('闲置中')
