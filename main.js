@@ -401,6 +401,7 @@ for (let i = 0; i < list.length; i++) {
 creepMap.forEach((creeps, type) => {
     var _a;
     let count = (_a = Memory[type]) !== null && _a !== void 0 ? _a : 0;
+    count -= 5;
     for (let i = 0; i < creeps.length; i++) {
         count += creepControllerMap[creeps[i].memory.type].ticker(creeps[i]);
     }
