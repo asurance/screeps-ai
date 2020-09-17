@@ -669,10 +669,10 @@ function Transfer(creep) {
         if (creep.transfer(target, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
             creep.say('运输中');
             creep.moveTo(target);
-            return 0;
+            return -1;
         }
         else {
-            return -2;
+            return -1;
         }
     }
     else {
