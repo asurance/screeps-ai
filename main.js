@@ -231,12 +231,33 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./util */ "./src/util.ts");
 
 function Harvest(creep) {
+    var _a;
     let target = null;
     if (creep.memory.harvestId) {
         target = Game.getObjectById(creep.memory.harvestId);
     }
-    if (target === null) {
+    let needRefresh = false;
+    if (target) {
+        if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
+            let ticker = (_a = creep.memory.harvestTicker) !== null && _a !== void 0 ? _a : 180;
+            ticker--;
+            if (ticker <= 0) {
+                needRefresh = true;
+                delete creep.memory.harvestTicker;
+            }
+            else {
+                creep.memory.harvestTicker = ticker;
+            }
+        }
+    }
+    if (target === null || needRefresh) {
         const source = creep.room.find(FIND_SOURCES);
+        if (needRefresh) {
+            const index = source.indexOf(target);
+            if (index >= 0) {
+                source.splice(index, 1);
+            }
+        }
         target = Object(_util__WEBPACK_IMPORTED_MODULE_0__["RandomObjectInList"])(source);
         if (target) {
             creep.memory.harvestId = target.id;
