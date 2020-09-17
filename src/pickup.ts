@@ -17,10 +17,10 @@ export function Pickup(creep: Creep<Pickupable>): number {
     }
     if (target) {
         if (creep.pickup(target) === ERR_NOT_IN_RANGE) {
-            creep.say('捡起中')
             creep.moveTo(target)
             return -1
         } else {
+            creep.say('捡起中')
             return -1
         }
     } else {

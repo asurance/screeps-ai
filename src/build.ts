@@ -22,10 +22,10 @@ export function Build(creep: Creep<Buildable>): number {
     }
     if (target) {
         if (creep.build(target) === ERR_NOT_IN_RANGE) {
-            creep.say('建造中')
             creep.moveTo(target)
             return 0
         } else {
+            creep.say('建造中')
             return -2
         }
     } else {

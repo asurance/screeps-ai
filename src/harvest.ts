@@ -37,10 +37,10 @@ export function Harvest(creep: Creep<Harvestable>): number {
     }
     if (target) {
         if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
-            creep.say('收获中')
             creep.moveTo(target)
             return 2
         } else {
+            creep.say('收获中')
             return -2
         }
     } else {

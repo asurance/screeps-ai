@@ -29,10 +29,10 @@ export function Repair(creep: Creep<Repairable>): number {
     }
     if (target) {
         if (creep.repair(target) === ERR_NOT_IN_RANGE) {
-            creep.say('维修中')
             creep.moveTo(target)
             return 0
         } else {
+            creep.say('维修中')
             return -2
         }
     } else {

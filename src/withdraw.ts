@@ -37,10 +37,10 @@ export function Withdraw(creep: Creep<Withdrawable>): number {
     }
     if (target) {
         if (creep.withdraw(target, 'energy') === ERR_NOT_IN_RANGE) {
-            creep.say('提取中')
             creep.moveTo(target)
             return 0
         } else {
+            creep.say('提取中')
             return -2
         }
     } else {
