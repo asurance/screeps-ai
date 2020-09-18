@@ -6,12 +6,9 @@ interface Memory {
     repairer?: number
 }
 
-interface Creep<T extends CreepMemoryData = CreepMemoryData> {
-    memory: T
-}
-
-interface CreepMemoryData<T extends Creeptype = CreepType> extends CreepMemory {
-    type: T
+interface CreepMemory {
+    type: CreepType
+    cmd?: Command
 }
 
 const enum CreepType {
@@ -20,4 +17,8 @@ const enum CreepType {
     Upgrader = 'upgrader',
     Builder = 'builder',
     Repairer = 'repairer',
+}
+
+const enum Command {
+    Harvest = 'harvest'
 }

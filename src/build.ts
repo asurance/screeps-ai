@@ -1,11 +1,12 @@
-interface Buildable extends CreepMemoryData {
+interface Buildable {
     buildId?: Id<ConstructionSite>
 }
 
-export function Build(creep: Creep<Buildable>): number {
+export function Build(creep: Creep): number {
+    const memory = creep.memory as Buildable
     let target: ConstructionSite<BuildableStructureConstant> | null = null
-    if (creep.memory.buildId) {
-        target = Game.getObjectById(creep.memory.buildId)
+    if (memory.buildId) {
+        target = Game.getObjectById(memory.buildId)
     }
     if (target === null) {
         const source = creep.room.find(FIND_MY_CONSTRUCTION_SITES)
@@ -17,7 +18,7 @@ export function Build(creep: Creep<Buildable>): number {
                     return pre
                 }
             })
-            creep.memory.buildId = target.id
+            memory.buildId = target.id
         }
     }
     if (target) {

@@ -3,7 +3,7 @@ import { Transfer } from './transfer'
 import { Pickup } from './pickup'
 import { RandomInt } from './util'
 
-interface Data extends CreepMemoryData {
+interface Data {
     type: CreepType.Transfer
     transfering?: boolean
     pickupId?: Id<Resource>
@@ -28,23 +28,24 @@ export const TransferController: CreepController<CreepType.Transfer> = {
         return spawn.spawnCreep(body, name)
     },
 
-    ticker(creep: Creep<Data>) {
-        let transfering = creep.memory.transfering ?? false
+    ticker(creep: Creep) {
+        const memory = creep.memory as Data
+        let transfering = memory.transfering ?? false
         if (transfering) {
             if (creep.store[RESOURCE_ENERGY] === 0) {
                 transfering = false
-                delete creep.memory.transferId
+                delete memory.transferId
             }
         } else {
             if (creep.store.getFreeCapacity() === 0) {
                 transfering = true
-                delete creep.memory.pickupId
+                delete memory.pickupId
             }
         }
         if (transfering) {
-            creep.memory.transfering = true
+            memory.transfering = true
         } else {
-            delete creep.memory.transfering
+            delete memory.transfering
         }
         if (transfering) {
             return Transfer(creep)

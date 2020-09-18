@@ -1,18 +1,19 @@
 import { RandomObjectInList } from './util'
 
-interface Pickupable extends CreepMemoryData {
+interface Pickupable {
     pickupId?: Id<Resource>
 }
-export function Pickup(creep: Creep<Pickupable>): number {
+export function Pickup(creep: Creep): number {
     let target: Resource | null = null
-    if (creep.memory.pickupId) {
-        target = Game.getObjectById(creep.memory.pickupId)
+    const memory = creep.memory as Pickupable
+    if (memory.pickupId) {
+        target = Game.getObjectById(memory.pickupId)
     }
     if (target === null) {
         const source = creep.room.find(FIND_DROPPED_RESOURCES)
         target = RandomObjectInList(source)
         if (target) {
-            creep.memory.pickupId = target.id
+            memory.pickupId = target.id
         }
     }
     if (target) {

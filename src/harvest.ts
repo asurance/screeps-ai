@@ -1,24 +1,25 @@
 import { RandomObjectInList } from './util'
 
-interface Harvestable extends CreepMemoryData {
+interface Harvestable {
     harvestId?: Id<Source>
     harvestTicker?: number
 }
-export function Harvest(creep: Creep<Harvestable>): number {
+export function Harvest(creep: Creep): number {
     let target: Source | null = null
-    if (creep.memory.harvestId) {
-        target = Game.getObjectById(creep.memory.harvestId)
+    const memory = creep.memory as Harvestable
+    if (memory.harvestId) {
+        target = Game.getObjectById(memory.harvestId)
     }
     let needRefresh = false
     if (target) {
         if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
-            let ticker = creep.memory.harvestTicker ?? 180
+            let ticker = memory.harvestTicker ?? 180
             ticker--
             if (ticker <= 0) {
                 needRefresh = true
-                delete creep.memory.harvestTicker
+                delete memory.harvestTicker
             } else {
-                creep.memory.harvestTicker = ticker
+                memory.harvestTicker = ticker
             }
         }
     }
@@ -32,7 +33,7 @@ export function Harvest(creep: Creep<Harvestable>): number {
         }
         target = RandomObjectInList(source)
         if (target) {
-            creep.memory.harvestId = target.id
+            memory.harvestId = target.id
         }
     }
     if (target) {

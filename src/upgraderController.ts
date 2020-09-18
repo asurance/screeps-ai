@@ -3,7 +3,7 @@ import { Upgrade } from './upgrade'
 import { RandomInt } from './util'
 import { Withdraw } from './withdraw'
 
-interface Data extends CreepMemoryData {
+interface Data {
     type: CreepType.Upgrader
     upgrading?: boolean
     withdrawId?: Id<Tombstone | Ruin | Structure>
@@ -27,8 +27,9 @@ export const UpgraderController: CreepController<CreepType.Upgrader> = {
         return spawn.spawnCreep(body, name)
     },
 
-    ticker(creep: Creep<Data>) {
-        let upgrading = creep.memory.upgrading ?? false
+    ticker(creep: Creep) {
+        const memory = creep.memory as Data
+        let upgrading = memory.upgrading ?? false
         if (upgrading) {
             if (creep.store[RESOURCE_ENERGY] === 0) {
                 upgrading = false
@@ -36,13 +37,13 @@ export const UpgraderController: CreepController<CreepType.Upgrader> = {
         } else {
             if (creep.store.getFreeCapacity() === 0) {
                 upgrading = true
-                delete creep.memory.withdrawId
+                delete memory.withdrawId
             }
         }
         if (upgrading) {
-            creep.memory.upgrading = true
+            memory.upgrading = true
         } else {
-            delete creep.memory.upgrading
+            delete memory.upgrading
         }
         if (upgrading) {
             return Upgrade(creep)

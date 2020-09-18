@@ -26,7 +26,7 @@ for (const key in Memory.creeps) {
 
 // 数据预处理
 for (const creepName in Game.creeps) {
-    const creep = Game.creeps[creepName] as Creep<CreepMemoryData>
+    const creep = Game.creeps[creepName]
     const list = creepMap.get(creep.memory.type)
     if (list) {
         list.push(creep)

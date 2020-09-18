@@ -3,7 +3,7 @@ import { Build } from './build'
 import { RandomInt } from './util'
 import { Withdraw } from './withdraw'
 
-interface Data extends CreepMemoryData {
+interface Data {
     type: CreepType.Builder
     building?: boolean
     withdrawId?: Id<Tombstone | Ruin | Structure>
@@ -28,23 +28,24 @@ export const BuilderController: CreepController<CreepType.Builder> = {
         return spawn.spawnCreep(body, name)
     },
 
-    ticker(creep: Creep<Data>) {
-        let building = creep.memory.building ?? false
+    ticker(creep: Creep) {
+        const memory =  creep.memory as Data
+        let building = memory.building ?? false
         if (building) {
             if (creep.store[RESOURCE_ENERGY] === 0) {
                 building = false
-                delete creep.memory.buildId
+                delete memory.buildId
             }
         } else {
             if (creep.store.getFreeCapacity() === 0) {
                 building = true
-                delete creep.memory.withdrawId
+                delete memory.withdrawId
             }
         }
         if (building) {
-            creep.memory.building = true
+            memory.building = true
         } else {
-            delete creep.memory.building
+            delete memory.building
         }
         if (building) {
             return Build(creep)

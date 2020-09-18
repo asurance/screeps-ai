@@ -1,13 +1,14 @@
 import { RandomObjectInList } from './util'
 
-interface Transferable extends CreepMemoryData {
+interface Transferable {
     transferId?: Id<AnyStructure>
 }
 
-export function Transfer(creep: Creep<Transferable>): number {
+export function Transfer(creep: Creep): number {
     let target: AnyStructure | null = null
-    if (creep.memory.transferId) {
-        target = Game.getObjectById(creep.memory.transferId)
+    const memory = creep.memory as Transferable
+    if (memory.transferId) {
+        target = Game.getObjectById(memory.transferId)
         if (target && (target as StructureSpawn | StructureTower | StructureExtension).store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
             target = null
         }
@@ -25,7 +26,7 @@ export function Transfer(creep: Creep<Transferable>): number {
         })
         target = RandomObjectInList(source)
         if (target) {
-            creep.memory.transferId = target.id
+            memory.transferId = target.id
         }
     }
     if (target) {

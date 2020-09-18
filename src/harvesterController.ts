@@ -2,11 +2,6 @@ import { CreepController, GetRequiredEnergy } from './creepController'
 import { Harvest } from './harvest'
 import { RandomInt } from './util'
 
-interface Data extends CreepMemoryData {
-    type: CreepType.Harvester
-    harvestId?: Id<Source>
-}
-
 export const HarvesterController: CreepController<CreepType.Harvester> = {
 
     type: CreepType.Harvester,
@@ -25,7 +20,7 @@ export const HarvesterController: CreepController<CreepType.Harvester> = {
         return spawn.spawnCreep(body, name)
     },
 
-    ticker(creep: Creep<Data>) {
+    ticker(creep: Creep) {
         return Harvest(creep)
     },
 }

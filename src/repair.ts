@@ -1,11 +1,12 @@
-interface Repairable extends CreepMemoryData {
+interface Repairable {
     repairId?: Id<Structure>
 }
 
-export function Repair(creep: Creep<Repairable>): number {
+export function Repair(creep: Creep): number {
     let target: Structure | null = null
-    if (creep.memory.repairId) {
-        target = Game.getObjectById(creep.memory.repairId)
+    const memory = creep.memory as Repairable
+    if (memory.repairId) {
+        target = Game.getObjectById(memory.repairId)
         if (target && (target.hits === target.hitsMax)) {
             target = null
         }
@@ -24,7 +25,7 @@ export function Repair(creep: Creep<Repairable>): number {
                     return cur
                 }
             })
-            creep.memory.repairId = target.id
+            memory.repairId = target.id
         }
     }
     if (target) {
