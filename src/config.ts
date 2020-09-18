@@ -1,0 +1,1 @@
+export const NotifyInterval = 24 * 60

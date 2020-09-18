@@ -1,4 +1,18 @@
+/**
+ * 配置
+ */
+interface Config {
+    /**
+     * 提醒间隔
+     */
+    notifyInterval: number
+}
+
 interface Memory {
+    /**
+     * 配置
+     */
+    config?: Partial<Config>
     harvester?: number
     transfer?: number
     upgrader?: number
@@ -6,19 +20,60 @@ interface Memory {
     repairer?: number
 }
 
+/**
+ * 策略数据
+ */
+interface StrategyData {
+    /**
+     * 策略类型
+     */
+    type: Strategy
+}
+
+/**
+ * 命令数据
+ */
+interface CommandData {
+    /**
+     * 命令类型
+     */
+    type: Command,
+}
+
 interface CreepMemory {
-    type: CreepType
-    cmd?: Command
+    /**
+     * 策略数据
+     */
+    strategy: StrategyData
+    /**
+     * 命令数据
+     */
+    cmd?: CommandData
 }
 
-const enum CreepType {
-    Harvester = 'harvester',
-    Transfer = 'transfer',
-    Upgrader = 'upgrader',
-    Builder = 'builder',
-    Repairer = 'repairer',
+/**
+ * 策略类型
+ */
+const enum Strategy {
+    /**
+     * 采集者
+     */
+    Harvester = 'harvester'
 }
 
+/**
+ * 命令类型
+ */
 const enum Command {
-    Harvest = 'harvest'
+    /**
+     * 采集
+     */
+    Harvest = 'harvest',
+    /**
+     * 移动
+     */
+    Move = 'move',
 }
+
+type Tail<T extends unknown[]> = T extends [unknown, ...argv: infer K] ? K : never
+type G = Tail<[number, string]>

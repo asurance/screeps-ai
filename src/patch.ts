@@ -3,6 +3,9 @@ interface Game {
     killAllCreeps(): void
 }
 
+/**
+ * 杀死所有Creep
+ */
 Game.killAllCreeps = () => {
     for (const name in Game.creeps) {
         Game.creeps[name].suicide()

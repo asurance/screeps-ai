@@ -1,11 +1,5 @@
-import { CreepController } from './creepController'
-import { HarvesterController } from './harvesterController'
-import { UpgraderController } from './upgraderController'
-import { BuilderController } from './builderController'
-import { RepairController } from './repairerController'
 import { RandomObjectInList } from './util'
 import './patch'
-import { TransferController } from './transferController'
 
 const creepControllerMap: { [key in CreepType]: CreepController<CreepType> } = {
     harvester: HarvesterController,
