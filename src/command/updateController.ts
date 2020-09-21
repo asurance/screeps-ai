@@ -1,4 +1,4 @@
-import { config } from './config'
+import { config } from '../config'
 
 /**
  * 升级控制器的结果

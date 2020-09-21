@@ -1,15 +1,15 @@
 import './patch'
-import { IStrategy } from './strategy'
-import { Harvester } from './harvester'
-import { ICommand } from './command'
-import { Harvest } from './harvest'
+import { IStrategy } from './strategy/strategy'
+import { Harvester } from './strategy/harvester'
+import { ICommand } from './command/command'
+import { Harvest } from './command/harvest'
 import { config } from './config'
 import { RandomObjectInList } from './util'
 import { creepInfo } from './global'
-import { UpdateController } from './updateController'
-import { Transfer } from './transfer'
-import { Pickup } from './pickup'
-import { Transferer } from './transferer'
+import { UpdateController } from './command/updateController'
+import { Transfer } from './command/transfer'
+import { Pickup } from './command/pickup'
+import { Transferer } from './strategy/transferer'
 
 // 删除过期数据
 for (const key in Memory.creeps) {

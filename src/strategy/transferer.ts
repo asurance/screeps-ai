@@ -1,9 +1,9 @@
-import { SetNextCommand } from './command'
-import { checkMoveFail, initMoveCache, MoveCacheData } from './moveCache'
-import { PickupResult } from './pickup'
+import { SetNextCommand } from '../command/command'
+import { checkMoveFail, initMoveCache, MoveCacheData } from '../moveCache'
+import { PickupResult } from '../command/pickup'
 import { IStrategy } from './strategy'
-import { TransferResult } from './transfer'
-import { GetRequiredEnergy, RandomObjectInList } from './util'
+import { TransferResult } from '../command/transfer'
+import { GetRequiredEnergy, RandomObjectInList } from '../util'
 
 /**
  * 运输者数据

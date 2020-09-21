@@ -1,8 +1,8 @@
-import { SetNextCommand } from './command'
-import { HarvestResult } from './harvest'
-import { checkMoveFail, initMoveCache, MoveCacheData } from './moveCache'
+import { SetNextCommand } from '../command/command'
+import { HarvestResult } from '../command/harvest'
+import { checkMoveFail, initMoveCache, MoveCacheData } from '../moveCache'
 import { IStrategy } from './strategy'
-import { GetRequiredEnergy, GetRoomInfo, RandomObjectInList } from './util'
+import { GetRequiredEnergy, GetRoomInfo, RandomObjectInList } from '../util'
 
 /**
  * 采集者数据

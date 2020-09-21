@@ -1,4 +1,4 @@
-import { CommandMap } from './command'
+import { CommandMap } from '../command/command'
 
 /**
  * 策略
