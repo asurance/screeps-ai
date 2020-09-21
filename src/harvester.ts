@@ -9,7 +9,7 @@ import { GetRequiredEnergy, GetRoomInfo, RandomObjectInList } from './util'
  */
 interface HarvesterData extends StrategyData {
     type: Strategy.Harvester
-    moveCahce: MoveCacheData
+    moveCache: MoveCacheData
 }
 
 /**
@@ -25,7 +25,7 @@ export const Harvester: IStrategy = {
     },
     initStrategy(creep: Creep) {
         const strategy = creep.memory.strategy as HarvesterData
-        strategy.moveCahce = initMoveCache(creep)
+        strategy.moveCache = initMoveCache(creep)
     },
     start(creep: Creep) {
         FindNextTarget(creep)
@@ -39,7 +39,7 @@ export const Harvester: IStrategy = {
                     FindNextTarget(creep)
                     break
                 case HarvestResult.Moving:
-                    if (checkMoveFail(creep, strategy.moveCahce)) {
+                    if (checkMoveFail(creep, strategy.moveCache)) {
                         FindNextTarget(creep)
                     }
                     break
@@ -51,14 +51,18 @@ export const Harvester: IStrategy = {
 /**
  * 找到下一个采集目标
  * @param creep creep
+ * @return 是否成功
  */
-function FindNextTarget(creep: Creep) {
+function FindNextTarget(creep: Creep): boolean {
     const roomInfos = GetRoomInfo(creep.room)
     const sourceId = RandomObjectInList(roomInfos.sourceInfo)
     if (sourceId) {
         const target = Game.getObjectById(sourceId)
         if (target) {
             SetNextCommand(Command.Harvest, creep, target)
+            return true
         }
     }
+    creep.say('闲置中')
+    return false
 }

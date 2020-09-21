@@ -7,6 +7,9 @@ import { config } from './config'
 import { RandomObjectInList } from './util'
 import { creepInfo } from './global'
 import { UpdateController } from './updateController'
+import { Transfer } from './transfer'
+import { Pickup } from './pickup'
+import { Transferer } from './transferer'
 
 // 删除过期数据
 for (const key in Memory.creeps) {
@@ -17,11 +20,14 @@ for (const key in Memory.creeps) {
 
 // 数据
 const strategyMap: { [key in Strategy]: IStrategy } = {
-    harvester: Harvester
+    harvester: Harvester,
+    transferer: Transferer,
 }
 const commandMap: { [key in Command]: ICommand } = {
     harvest: Harvest,
-    updateController: UpdateController
+    updateController: UpdateController,
+    transfer: Transfer,
+    pickup: Pickup,
 }
 const spawn = Game.spawns['Home']
 

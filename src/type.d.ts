@@ -10,6 +10,10 @@ interface Config {
      * 采集者数量
      */
     harvester: number
+    /**
+     * 运输者数量
+     */
+    transferer: number
 }
 
 interface Memory {
@@ -64,7 +68,11 @@ const enum Strategy {
     /**
      * 采集者
      */
-    Harvester = 'harvester'
+    Harvester = 'harvester',
+    /**
+     * 运输者
+     */
+    Transferer = 'transferer'
 }
 
 /**
@@ -79,6 +87,14 @@ const enum Command {
      * 升级控制器
      */
     UpdateController = 'updateController',
+    /**
+     * 转移
+     */
+    Transfer = 'transfer',
+    /**
+     * 捡起
+     */
+    Pickup = 'pickup',
 }
 
 /**
