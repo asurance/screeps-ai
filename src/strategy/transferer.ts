@@ -22,7 +22,7 @@ export const Transferer: IStrategy = {
         let rest = maxEnergy - this.minEnergy
         const body: BodyPartConstant[] = [CARRY, MOVE]
         if (rest >= BODYPART_COST.carry) {
-            body.unshift(MOVE)
+            body.unshift(CARRY)
             rest -= BODYPART_COST.carry
         }
         const count = Math.floor(rest / (BODYPART_COST.carry * 2 + BODYPART_COST.move))
