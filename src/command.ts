@@ -1,12 +1,12 @@
 import { Harvest, SetCreepHarvest } from './harvest'
-import { Move, SetCreepMove } from './move'
+import { SetCreepUpdateController, UpdateController } from './updateController'
 
 /**
  * 命令声明表
  */
 export interface CommandMap {
-    [Command.Move]: typeof Move
     [Command.Harvest]: typeof Harvest
+    [Command.UpdateController]: typeof UpdateController
 }
 
 export interface ICommand {
@@ -17,8 +17,8 @@ export interface ICommand {
  * 设置命令表
  */
 const SetCommandMap = {
-    [Command.Move]: SetCreepMove,
     [Command.Harvest]: SetCreepHarvest,
+    [Command.UpdateController]: SetCreepUpdateController
 }
 
 /**

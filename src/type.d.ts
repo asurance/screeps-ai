@@ -76,9 +76,9 @@ const enum Command {
      */
     Harvest = 'harvest',
     /**
-     * 移动
+     * 升级控制器
      */
-    Move = 'move',
+    UpdateController = 'updateController',
 }
 
 /**

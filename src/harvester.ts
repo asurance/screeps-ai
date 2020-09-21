@@ -1,6 +1,6 @@
 import { SetNextCommand } from './command'
 import { HarvestResult } from './harvest'
-import { MoveResult } from './move'
+import { checkMoveFail, initMoveCache, MoveCacheData } from './moveCache'
 import { IStrategy } from './strategy'
 import { GetRequiredEnergy, GetRoomInfo, RandomObjectInList } from './util'
 
@@ -9,7 +9,7 @@ import { GetRequiredEnergy, GetRoomInfo, RandomObjectInList } from './util'
  */
 interface HarvesterData extends StrategyData {
     type: Strategy.Harvester
-    targetId: Id<Source>
+    moveCahce: MoveCacheData
 }
 
 /**
@@ -23,26 +23,26 @@ export const Harvester: IStrategy = {
         body.splice(0, 0, ...new Array<BodyPartConstant>(count).fill(WORK))
         return body
     },
+    initStrategy(creep: Creep) {
+        const strategy = creep.memory.strategy as HarvesterData
+        strategy.moveCahce = initMoveCache(creep)
+    },
     start(creep: Creep) {
-        FindNextTargetAndMove(creep)
+        FindNextTarget(creep)
     },
     callbackMap: {
-        [Command.Move]: (creep: Creep, result: MoveResult): void => {
-            const strategy = creep.memory.strategy as HarvesterData
-            const target = Game.getObjectById(strategy.targetId)!
-            switch (result) {
-                case MoveResult.InRange:
-                    SetNextCommand(Command.Harvest, creep, target)
-                    break
-                case MoveResult.TargetLost:
-                case MoveResult.TargetNeedReplace:
-                    FindNextTargetAndMove(creep)
-                    break
-            }
-        },
         [Command.Harvest]: (creep: Creep, result: HarvestResult): void => {
-            if (result !== HarvestResult.OK) {
-                FindNextTargetAndMove(creep)
+            const strategy = creep.memory.strategy as HarvesterData
+            switch (result) {
+                case HarvestResult.TargetLost:
+                case HarvestResult.TargetNeedReplace:
+                    FindNextTarget(creep)
+                    break
+                case HarvestResult.Moving:
+                    if (checkMoveFail(creep, strategy.moveCahce)) {
+                        FindNextTarget(creep)
+                    }
+                    break
             }
         }
     },
@@ -52,13 +52,13 @@ export const Harvester: IStrategy = {
  * 找到下一个采集目标
  * @param creep creep
  */
-function FindNextTargetAndMove(creep: Creep) {
+function FindNextTarget(creep: Creep) {
     const roomInfos = GetRoomInfo(creep.room)
     const sourceId = RandomObjectInList(roomInfos.sourceInfo)
     if (sourceId) {
         const target = Game.getObjectById(sourceId)
         if (target) {
-            SetNextCommand(Command.Move, creep, target, 1)
+            SetNextCommand(Command.Harvest, creep, target)
         }
     }
 }

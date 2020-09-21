@@ -23,6 +23,10 @@ export const enum HarvestResult {
      */
     OK,
     /**
+     * 移动中
+     */
+    Moving,
+    /**
      * 目标丢失
      */
     TargetLost,
@@ -52,13 +56,21 @@ export function Harvest(creep: Creep): HarvestResult {
     const target = Game.getObjectById(command.target)
     if (target) {
         if (target.energy > 0 || target.ticksToRegeneration < 100) {
-            if (target.energy > 0) {
-                const result = creep.harvest(target)
-                if (result !== OK) {
-                    Game.notify(`harvest fail with code:${result}`, config.notifyInterval)
+            if (creep.pos.inRangeTo(target.pos, 1)) {
+                if (target.energy > 0) {
+                    const result = creep.harvest(target)
+                    if (result !== OK) {
+                        Game.notify(`harvest fail with code:${result}`, config.notifyInterval)
+                    }
                 }
+                return HarvestResult.OK
+            } else {
+                const result = creep.moveTo(target, { range: 1 })
+                if (result !== OK) {
+                    Game.notify(`move fail with code:${result}`, config.notifyInterval)
+                }
+                return HarvestResult.Moving
             }
-            return HarvestResult.OK
         } else {
             return HarvestResult.TargetNeedReplace
         }

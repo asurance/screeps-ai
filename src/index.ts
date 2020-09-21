@@ -2,11 +2,11 @@ import './patch'
 import { IStrategy } from './strategy'
 import { Harvester } from './harvester'
 import { ICommand } from './command'
-import { Move } from './move'
 import { Harvest } from './harvest'
 import { config } from './config'
 import { RandomObjectInList } from './util'
 import { creepInfo } from './global'
+import { UpdateController } from './updateController'
 
 // 删除过期数据
 for (const key in Memory.creeps) {
@@ -20,8 +20,8 @@ const strategyMap: { [key in Strategy]: IStrategy } = {
     harvester: Harvester
 }
 const commandMap: { [key in Command]: ICommand } = {
-    move: Move,
     harvest: Harvest,
+    updateController: UpdateController
 }
 const spawn = Game.spawns['Home']
 
@@ -52,6 +52,7 @@ for (const name in Game.creeps) {
     }
 }
 
+// 生成新creep
 if (!spawn.spawning) {
     let spawing: Strategy | null = null
     let list = [Strategy.Harvester]
@@ -78,10 +79,15 @@ if (!spawn.spawning) {
         spawing = RandomObjectInList(list)
     }
     if (spawing) {
-        const result = spawn.spawnCreep(strategyMap[spawing].create(spawn.room.energyAvailable),
-            `${spawn.name}-${spawing}-${Game.time}`,
-        )
-        if (result !== OK) {
+        const name = `${spawn.name}-${spawing}-${Game.time}`
+        const result = spawn.spawnCreep(strategyMap[spawing].create(spawn.room.energyAvailable), name)
+        if (result === OK) {
+            const creep = Game.creeps[name]
+            creep.memory.strategy = {
+                type: spawing
+            }
+            strategyMap[spawing].initStrategy(creep)
+        } else {
             Game.notify(`spawn creep fail with code:${result}`, config.notifyInterval)
         }
     }

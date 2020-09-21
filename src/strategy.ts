@@ -15,6 +15,11 @@ export interface IStrategy {
      */
     create(maxEnergy: number): BodyPartConstant[]
     /**
+     * 初始化策略
+     * @param creep Creep
+     */
+    initStrategy(creep: Creep): void
+    /**
      * 启动Creep
      * @param creep Creep
      */
@@ -22,5 +27,5 @@ export interface IStrategy {
     /**
      * Command完成后回调
      */
-    callbackMap: { [key in Command]: (creep: Creep, result: ReturnType<CommandMap[key]>) => void }
+    callbackMap: { [key in Command]?: (creep: Creep, result: ReturnType<CommandMap[key]>) => void }
 }
