@@ -10,6 +10,10 @@ import { UpdateController } from './command/updateController'
 import { Transfer } from './command/transfer'
 import { Pickup } from './command/pickup'
 import { Transferer } from './strategy/transferer'
+import { Worker } from './strategy/worker'
+import { Withdraw } from './command/withdraw'
+import { Build } from './command/build'
+import { Repair } from './command/repair'
 
 // 删除过期数据
 for (const key in Memory.creeps) {
@@ -22,12 +26,16 @@ for (const key in Memory.creeps) {
 const strategyMap: { [key in Strategy]: IStrategy } = {
     harvester: Harvester,
     transferer: Transferer,
+    worker: Worker,
 }
 const commandMap: { [key in Command]: ICommand } = {
     harvest: Harvest,
     updateController: UpdateController,
     transfer: Transfer,
     pickup: Pickup,
+    withdraw: Withdraw,
+    build: Build,
+    repair: Repair,
 }
 const spawn = Game.spawns['Home']
 

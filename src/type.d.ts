@@ -14,6 +14,10 @@ interface Config {
      * 运输者数量
      */
     transferer: number
+    /**
+     * 工作者数量
+     */
+    worker: number
 }
 
 interface Memory {
@@ -72,7 +76,11 @@ const enum Strategy {
     /**
      * 运输者
      */
-    Transferer = 'transferer'
+    Transferer = 'transferer',
+    /**
+     * 工作者
+     */
+    Worker = 'worker',
 }
 
 /**
@@ -95,6 +103,18 @@ const enum Command {
      * 捡起
      */
     Pickup = 'pickup',
+    /**
+     * 取回
+     */
+    Withdraw = 'withdraw',
+    /**
+     * 建造
+     */
+    Build = 'build',
+    /**
+     * 维修
+     */
+    Repair = 'repair',
 }
 
 /**

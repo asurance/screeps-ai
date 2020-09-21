@@ -19,10 +19,15 @@ interface TransfererData extends StrategyData {
 export const Transferer: IStrategy = {
     minEnergy: GetRequiredEnergy([CARRY, MOVE]),
     create(maxEnergy: number) {
-        const count = Math.floor((maxEnergy - this.minEnergy) / (BODYPART_COST.carry + BODYPART_COST.move))
+        let rest = maxEnergy - this.minEnergy
         const body: BodyPartConstant[] = [CARRY, MOVE]
+        if (rest >= BODYPART_COST.carry) {
+            body.unshift(MOVE)
+            rest -= BODYPART_COST.carry
+        }
+        const count = Math.floor(rest / (BODYPART_COST.carry * 2 + BODYPART_COST.move))
         for (let i = 0; i < count; i++) {
-            body.push(CARRY, MOVE)
+            body.push(CARRY, CARRY, MOVE)
         }
         return body
     },

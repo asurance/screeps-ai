@@ -45,6 +45,10 @@ export function SetCreepPickup(creep: Creep, target: Resource): void {
     command.target = target.id
 }
 
+/**
+ * 捡起
+ * @param creep Creep
+ */
 export function Pickup(creep: Creep): PickupResult {
     const command = creep.memory.cmd as PickupData
     const target = Game.getObjectById(command.target)
@@ -58,7 +62,7 @@ export function Pickup(creep: Creep): PickupResult {
                     }
                     return PickupResult.OK
                 } else {
-                    const result = creep.moveTo(creep.room.controller!, { range: 1 })
+                    const result = creep.moveTo(target, { range: 1 })
                     if (result !== OK) {
                         Game.notify(`move fail with code:${result}`, config.notifyInterval)
                     }
