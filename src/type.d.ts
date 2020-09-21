@@ -6,6 +6,10 @@ interface Config {
      * 提醒间隔
      */
     notifyInterval: number
+    /**
+     * 采集者数量
+     */
+    harvester: number
 }
 
 interface Memory {
@@ -13,11 +17,13 @@ interface Memory {
      * 配置
      */
     config?: Partial<Config>
-    harvester?: number
-    transfer?: number
-    upgrader?: number
-    builder?: number
-    repairer?: number
+}
+
+/**
+ * 房间数据
+ */
+interface RoomMemory {
+    sourceInfo: Id<Source>[]
 }
 
 /**
@@ -75,5 +81,7 @@ const enum Command {
     Move = 'move',
 }
 
+/**
+ * 去掉tuple类型第一个参数
+ */
 type Tail<T extends unknown[]> = T extends [unknown, ...argv: infer K] ? K : never
-type G = Tail<[number, string]>

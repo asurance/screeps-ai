@@ -1,3 +1,5 @@
+import { config } from './config'
+
 /**
  * 收获数据
  */
@@ -49,11 +51,12 @@ export function Harvest(creep: Creep): HarvestResult {
     const command = creep.memory.cmd as HarvestData
     const target = Game.getObjectById(command.target)
     if (target) {
-        ENERGY_REGEN_TIME
-        if (target.energy > 0 || target.ticksToRegeneration > 100) {
-            const result = creep.harvest(target)
-            if (result !== OK) {
-                Game.notify(`harvest fail with code:${result}`, 60)
+        if (target.energy > 0 || target.ticksToRegeneration < 100) {
+            if (target.energy > 0) {
+                const result = creep.harvest(target)
+                if (result !== OK) {
+                    Game.notify(`harvest fail with code:${result}`, config.notifyInterval)
+                }
             }
             return HarvestResult.OK
         } else {

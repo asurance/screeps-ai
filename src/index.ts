@@ -1,15 +1,12 @@
-import { RandomObjectInList } from './util'
 import './patch'
-
-const creepControllerMap: { [key in CreepType]: CreepController<CreepType> } = {
-    harvester: HarvesterController,
-    transfer: TransferController,
-    upgrader: UpgraderController,
-    builder: BuilderController,
-    repairer: RepairController,
-}
-
-const creepMap = new Map<CreepType, Creep[]>()
+import { IStrategy } from './strategy'
+import { Harvester } from './harvester'
+import { ICommand } from './command'
+import { Move } from './move'
+import { Harvest } from './harvest'
+import { config } from './config'
+import { RandomObjectInList } from './util'
+import { creepInfo } from './global'
 
 // 删除过期数据
 for (const key in Memory.creeps) {
@@ -18,19 +15,14 @@ for (const key in Memory.creeps) {
     }
 }
 
-// 数据预处理
-for (const creepName in Game.creeps) {
-    const creep = Game.creeps[creepName]
-    const list = creepMap.get(creep.memory.type)
-    if (list) {
-        list.push(creep)
-    } else {
-        creepMap.set(creep.memory.type, [creep])
-    }
+// 数据
+const strategyMap: { [key in Strategy]: IStrategy } = {
+    harvester: Harvester
 }
-
-let spawning: CreepType | null = null
-
+const commandMap: { [key in Command]: ICommand } = {
+    move: Move,
+    harvest: Harvest,
+}
 const spawn = Game.spawns['Home']
 
 // 塔设置
@@ -45,52 +37,52 @@ towers.forEach(tower => {
     }
 })
 
-const list = [CreepType.Harvester, CreepType.Transfer, CreepType.Upgrader, CreepType.Builder, CreepType.Repairer]
-
-// 最少生成一项
-for (let i = 0; i < list.length; i++) {
-    const l = creepMap.get(list[i])
-    if (l) {
-        if (l.length >= 10) {
-            list.splice(i, 1)
-            i--
-        }
-    } else {
-        spawning = list[i]
-        break
-    }
-}
-// 操作并且对闲置计数
-creepMap.forEach((creeps, type) => {
-    let count = Memory[type] ?? 0
-    count -= 5
-    for (let i = 0; i < creeps.length; i++) {
-        count += creepControllerMap[creeps[i].memory.type].ticker(creeps[i])
-    }
-    if (count <= 0) {
-        delete Memory[type]
-    } else {
-        Memory[type] = count
-        const index = list.indexOf(type)
-        if (index >= 0) {
-            list.splice(index, 1)
-        }
-    }
-})
-
-// 生成新creeps
-if (spawning === null) {
-    spawning = RandomObjectInList(list)
-}
-if (spawning !== null) {
-    const controller = creepControllerMap[spawning]
-    if (spawn.room.energyAvailable >= controller.minEnergy) {
-        const name = `${spawning}-${spawn.name}-${Game.time}`
-        const result = controller.create(spawn, name, spawn.room.energyAvailable)
-        if (result === OK) {
-            Game.creeps[name].memory.type = controller.type
+// creep操作
+for (const name in Game.creeps) {
+    const creep = Game.creeps[name]
+    if (!creep.spawning) {
+        const strategyType = creep.memory.strategy.type
+        if (creep.memory.cmd) {
+            const commandType = creep.memory.cmd.type
+            // @ts-expect-error ts暂时无法识别该类型
+            strategyMap[strategyType].callbackMap[commandType](creep, commandMap[commandType](creep))
         } else {
-            Game.notify(`spawn object fail:${spawning} ${name} ${result}`, 60)
+            strategyMap[strategyType].start(creep)
+        }
+    }
+}
+
+if (!spawn.spawning) {
+    let spawing: Strategy | null = null
+    let list = [Strategy.Harvester]
+    for (let i = 0; i < list.length; i++) {
+        const map = creepInfo.get(list[i])
+        if (map) {
+            let sum = 0
+            map.forEach(v => sum += v.length)
+            if (sum >= config[list[i]]) {
+                list.splice(i, 1)
+                i--
+            }
+        } else {
+            spawing = list[i]
+            break
+        }
+    }
+    if (spawing) {
+        if (spawn.room.energyAvailable < strategyMap[spawing].minEnergy) {
+            spawing = null
+        }
+    } else {
+        list = list.filter(s => spawn.room.energyAvailable >= strategyMap[s].minEnergy)
+        spawing = RandomObjectInList(list)
+    }
+    if (spawing) {
+        const result = spawn.spawnCreep(strategyMap[spawing].create(spawn.room.energyAvailable),
+            `${spawn.name}-${spawing}-${Game.time}`,
+        )
+        if (result !== OK) {
+            Game.notify(`spawn creep fail with code:${result}`, config.notifyInterval)
         }
     }
 }

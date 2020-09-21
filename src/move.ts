@@ -1,3 +1,5 @@
+import { config } from './config'
+
 /**
  * 移动使用的数据
  */
@@ -14,6 +16,14 @@ interface MoveData extends CommandData {
      * 移动需要达到的
      */
     range: number
+    /**
+     * 位置
+     */
+    pos: number
+    /**
+     * 更新ticker
+     */
+    ticker: number
 }
 
 /**
@@ -48,6 +58,7 @@ export function SetCreepMove(creep: Creep, target: RoomObject & { id: Id<RoomObj
     const command = creep.memory.cmd as MoveData
     command.target = target.id
     command.range = range
+    command.ticker = 30
 }
 
 /**
@@ -62,11 +73,23 @@ export function Move(creep: Creep): MoveResult {
         if (target.room === creep.room && creep.pos.inRangeTo(target.pos, command.range)) {
             return MoveResult.InRange
         } else {
+            let res = MoveResult.NotInRange
+            command.ticker--
+            if (command.ticker <= 0) {
+                command.ticker = 30
+                const x = command.pos % 50
+                const y = Math.floor(command.pos / 50)
+                if (creep.pos.inRangeTo(x, y, 3)) {
+                    res = MoveResult.TargetNeedReplace
+                } else {
+                    command.pos = creep.pos.x + creep.pos.y * 50
+                }
+            }
             const result = creep.moveTo(target, { range: command.range })
             if (result !== OK) {
-                Game.notify(`move fail with code:${result}`, 1440)
+                Game.notify(`move fail with code:${result}`, config.notifyInterval)
             }
-            return MoveResult.NotInRange
+            return res
         }
     }
     return MoveResult.TargetLost
