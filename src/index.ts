@@ -70,7 +70,7 @@ for (const name in Game.creeps) {
 // 生成新creep
 if (!spawn.spawning) {
     let spawing: Strategy | null = null
-    let list = [Strategy.Harvester]
+    let list = [Strategy.Harvester, Strategy.Transferer, Strategy.Worker]
     for (let i = 0; i < list.length; i++) {
         const map = creepInfo.get(list[i])
         if (map) {
