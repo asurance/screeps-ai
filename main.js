@@ -807,6 +807,7 @@ function checkMoveFail(creep, data) {
         }
     }
     else {
+        data.pos = creep.pos.x + creep.pos.y * 50;
         data.ticker = 30;
         return false;
     }
