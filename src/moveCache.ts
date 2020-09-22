@@ -42,6 +42,7 @@ export function checkMoveFail(creep: Creep, data: MoveCacheData): boolean {
             return false
         }
     } else {
+        data.pos = creep.pos.x + creep.pos.y * 50
         data.ticker = 30
         return false
     }
