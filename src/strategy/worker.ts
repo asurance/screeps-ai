@@ -20,11 +20,13 @@ interface WorkerData extends StrategyData {
  * 采集者策略
  */
 export const Worker: IStrategy = {
-    minEnergy: GetRequiredEnergy([MOVE, WORK]),
+    minEnergy: GetRequiredEnergy([MOVE, WORK, CARRY]),
     create(maxEnergy: number) {
-        const count = Math.min(4, Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work))
-        const body: BodyPartConstant[] = [MOVE, WORK]
-        body.splice(0, 0, ...new Array<BodyPartConstant>(count).fill(WORK))
+        const count = Math.min(4, Math.floor(maxEnergy / (BODYPART_COST.work + BODYPART_COST.move + BODYPART_COST.carry)))
+        const body: BodyPartConstant[] = []
+        for (let i = 0; i < count; i++) {
+            body.push(MOVE, WORK, CARRY)
+        }
         return body
     },
     initStrategy(creep: Creep) {
