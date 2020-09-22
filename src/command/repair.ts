@@ -59,7 +59,7 @@ export function Repair(creep: Creep): RepairResult {
     const target = Game.getObjectById(command.target)
     if (target) {
         if (creep.store.energy > 0) {
-            if (target.hits === target.hitsMax) {
+            if (target.hits < target.hitsMax) {
                 if (creep.pos.inRangeTo(target, 3)) {
                     const result = creep.repair(target)
                     if (result !== OK) {

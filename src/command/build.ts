@@ -59,7 +59,7 @@ export function Build(creep: Creep): BuildResult {
     const target = Game.getObjectById(command.target)
     if (target) {
         if (creep.store.energy > 0) {
-            if (target.progress === target.progressTotal) {
+            if (target.progress < target.progressTotal) {
                 if (creep.pos.inRangeTo(target, 3)) {
                     const result = creep.build(target)
                     if (result !== OK) {
