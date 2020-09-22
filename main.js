@@ -117,7 +117,7 @@ function Build(creep) {
     const target = Game.getObjectById(command.target);
     if (target) {
         if (creep.store.energy > 0) {
-            if (target.progress === target.progressTotal) {
+            if (target.progress < target.progressTotal) {
                 if (creep.pos.inRangeTo(target, 3)) {
                     const result = creep.build(target);
                     if (result !== OK) {
@@ -353,7 +353,7 @@ function Repair(creep) {
     const target = Game.getObjectById(command.target);
     if (target) {
         if (creep.store.energy > 0) {
-            if (target.hits === target.hitsMax) {
+            if (target.hits < target.hitsMax) {
                 if (creep.pos.inRangeTo(target, 3)) {
                     const result = creep.repair(target);
                     if (result !== OK) {
@@ -866,7 +866,7 @@ __webpack_require__.r(__webpack_exports__);
 const Harvester = {
     minEnergy: Object(_util__WEBPACK_IMPORTED_MODULE_2__["GetRequiredEnergy"])([MOVE, WORK]),
     create(maxEnergy) {
-        const count = Math.min(4, Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work));
+        const count = Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work);
         const body = [MOVE, WORK];
         body.splice(0, 0, ...new Array(count).fill(WORK));
         return body;
@@ -1072,7 +1072,7 @@ __webpack_require__.r(__webpack_exports__);
 const Worker = {
     minEnergy: Object(_util__WEBPACK_IMPORTED_MODULE_2__["GetRequiredEnergy"])([MOVE, WORK, CARRY]),
     create(maxEnergy) {
-        const count = Math.min(4, Math.floor(maxEnergy / (BODYPART_COST.work + BODYPART_COST.move + BODYPART_COST.carry)));
+        const count = Math.floor(maxEnergy / (BODYPART_COST.work + BODYPART_COST.move + BODYPART_COST.carry));
         const body = [];
         for (let i = 0; i < count; i++) {
             body.push(MOVE, WORK, CARRY);
@@ -1287,7 +1287,7 @@ function FindNextWork(creep) {
     if (index >= 0) {
         counts[index]--;
     }
-    for (let i = 0; i < counts[i]; i++) {
+    for (let i = 0; i < counts.length; i++) {
         if (counts[i] === 0) {
             const result = fns[i](creep);
             if (result) {
