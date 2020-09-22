@@ -22,7 +22,7 @@ interface WorkerData extends StrategyData {
 export const Worker: IStrategy = {
     minEnergy: GetRequiredEnergy([MOVE, WORK, CARRY]),
     create(maxEnergy: number) {
-        const count = Math.min(4, Math.floor(maxEnergy / (BODYPART_COST.work + BODYPART_COST.move + BODYPART_COST.carry)))
+        const count = Math.floor(maxEnergy / (BODYPART_COST.work + BODYPART_COST.move + BODYPART_COST.carry))
         const body: BodyPartConstant[] = []
         for (let i = 0; i < count; i++) {
             body.push(MOVE, WORK, CARRY)

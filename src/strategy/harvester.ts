@@ -18,7 +18,7 @@ interface HarvesterData extends StrategyData {
 export const Harvester: IStrategy = {
     minEnergy: GetRequiredEnergy([MOVE, WORK]),
     create(maxEnergy: number) {
-        const count = Math.min(4, Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work))
+        const count = Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work)
         const body: BodyPartConstant[] = [MOVE, WORK]
         body.splice(0, 0, ...new Array<BodyPartConstant>(count).fill(WORK))
         return body
