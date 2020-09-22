@@ -94,7 +94,7 @@ const enum Command {
     /**
      * 升级控制器
      */
-    UpdateController = 'updateController',
+    UpgradeController = 'updateController',
     /**
      * 转移
      */

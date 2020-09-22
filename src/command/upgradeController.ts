@@ -22,7 +22,7 @@ export const enum UpdateControllerResult {
  * 升级控制器前
  * @param creep Creep
  */
-export function SetCreepUpdateController(): void {
+export function SetCreepUpgradeController(): void {
     // TODO 暂时没有需要做的
 }
 

@@ -31,14 +31,19 @@ export function initMoveCache(creep: Creep): MoveCacheData {
  * @return 是否失效
  */
 export function checkMoveFail(creep: Creep, data: MoveCacheData): boolean {
-    data.ticker--
-    if (data.ticker <= 0) {
-        data.ticker = 30
-        const x = data.pos % 50
-        const y = Math.floor(data.pos / 50)
-        if (creep.pos.inRangeTo(x, y, 3)) {
+    const x = data.pos % 50
+    const y = Math.floor(data.pos / 50)
+    if (creep.pos.inRangeTo(x, y, 3)) {
+        data.ticker--
+        if (data.ticker <= 0) {
+            data.ticker = 30
             return true
+        } else {
+            return false
         }
+    } else {
+        data.ticker = 30
+        return false
     }
-    return false
+
 }

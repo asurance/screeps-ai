@@ -3,7 +3,7 @@ import { Harvest, SetCreepHarvest } from './harvest'
 import { Pickup, SetCreepPickup } from './pickup'
 import { Repair, SetCreepRepair } from './repair'
 import { SetCreepTransfer, Transfer } from './transfer'
-import { SetCreepUpdateController, UpdateController } from './updateController'
+import { SetCreepUpgradeController, UpdateController } from './upgradeController'
 import { SetCreepWithdraw, Withdraw } from './withdraw'
 
 /**
@@ -11,7 +11,7 @@ import { SetCreepWithdraw, Withdraw } from './withdraw'
  */
 export interface CommandMap {
     [Command.Harvest]: typeof Harvest
-    [Command.UpdateController]: typeof UpdateController
+    [Command.UpgradeController]: typeof UpdateController
     [Command.Transfer]: typeof Transfer
     [Command.Pickup]: typeof Pickup
     [Command.Withdraw]: typeof Withdraw
@@ -28,7 +28,7 @@ export interface ICommand {
  */
 const SetCommandMap = {
     [Command.Harvest]: SetCreepHarvest,
-    [Command.UpdateController]: SetCreepUpdateController,
+    [Command.UpgradeController]: SetCreepUpgradeController,
     [Command.Transfer]: SetCreepTransfer,
     [Command.Pickup]: SetCreepPickup,
     [Command.Withdraw]: SetCreepWithdraw,
