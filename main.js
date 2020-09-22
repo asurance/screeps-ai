@@ -721,7 +721,7 @@ for (const name in Game.creeps) {
 // 生成新creep
 if (!spawn.spawning) {
     let spawing = null;
-    let list = ["harvester" /* Harvester */];
+    let list = ["harvester" /* Harvester */, "transferer" /* Transferer */, "worker" /* Worker */];
     for (let i = 0; i < list.length; i++) {
         const map = _global__WEBPACK_IMPORTED_MODULE_1__["creepInfo"].get(list[i]);
         if (map) {
