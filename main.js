@@ -1070,11 +1070,13 @@ __webpack_require__.r(__webpack_exports__);
  * 采集者策略
  */
 const Worker = {
-    minEnergy: Object(_util__WEBPACK_IMPORTED_MODULE_2__["GetRequiredEnergy"])([MOVE, WORK]),
+    minEnergy: Object(_util__WEBPACK_IMPORTED_MODULE_2__["GetRequiredEnergy"])([MOVE, WORK, CARRY]),
     create(maxEnergy) {
-        const count = Math.min(4, Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work));
-        const body = [MOVE, WORK];
-        body.splice(0, 0, ...new Array(count).fill(WORK));
+        const count = Math.min(4, Math.floor(maxEnergy / (BODYPART_COST.work + BODYPART_COST.move + BODYPART_COST.carry)));
+        const body = [];
+        for (let i = 0; i < count; i++) {
+            body.push(MOVE, WORK, CARRY);
+        }
         return body;
     },
     initStrategy(creep) {
