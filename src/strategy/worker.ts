@@ -239,7 +239,7 @@ function FindNextWork(creep: Creep): boolean {
     if (index >= 0) {
         counts[index]--
     }
-    for (let i = 0; i < counts[i]; i++) {
+    for (let i = 0; i < counts.length; i++) {
         if (counts[i] === 0) {
             const result = fns[i](creep)
             if (result) {
