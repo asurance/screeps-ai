@@ -20,6 +20,7 @@ const config = {
     output: {
         filename: 'main.js',
         path: resolve(__dirname, '../dist'),
+        libraryTarget: 'commonjs2'
     },
 } as Configuration
 
