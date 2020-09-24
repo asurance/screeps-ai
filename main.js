@@ -613,17 +613,30 @@ exports.config = Memory.config ? Object.assign(Object.assign({}, defualtConfig),
 
 /***/ }),
 
-/***/ "./src/global.ts":
-/*!***********************!*\
-  !*** ./src/global.ts ***!
-  \***********************/
+/***/ "./src/index.ts":
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.creepInfo = void 0;
+exports.loop = exports.creepInfo = void 0;
+__webpack_require__(/*! ./patch */ "./src/patch.ts");
+const harvester_1 = __webpack_require__(/*! ./strategy/harvester */ "./src/strategy/harvester.ts");
+const harvest_1 = __webpack_require__(/*! ./command/harvest */ "./src/command/harvest.ts");
+const config_1 = __webpack_require__(/*! ./config */ "./src/config.ts");
+const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
+const upgradeController_1 = __webpack_require__(/*! ./command/upgradeController */ "./src/command/upgradeController.ts");
+const transfer_1 = __webpack_require__(/*! ./command/transfer */ "./src/command/transfer.ts");
+const pickup_1 = __webpack_require__(/*! ./command/pickup */ "./src/command/pickup.ts");
+const transferer_1 = __webpack_require__(/*! ./strategy/transferer */ "./src/strategy/transferer.ts");
+const worker_1 = __webpack_require__(/*! ./strategy/worker */ "./src/strategy/worker.ts");
+const withdraw_1 = __webpack_require__(/*! ./command/withdraw */ "./src/command/withdraw.ts");
+const build_1 = __webpack_require__(/*! ./command/build */ "./src/command/build.ts");
+const repair_1 = __webpack_require__(/*! ./command/repair */ "./src/command/repair.ts");
 /**
  * creep信息
  */
@@ -650,35 +663,6 @@ function CreateCreepInfo() {
     }
     return creepInfo;
 }
-
-
-/***/ }),
-
-/***/ "./src/index.ts":
-/*!**********************!*\
-  !*** ./src/index.ts ***!
-  \**********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.loop = void 0;
-__webpack_require__(/*! ./patch */ "./src/patch.ts");
-const harvester_1 = __webpack_require__(/*! ./strategy/harvester */ "./src/strategy/harvester.ts");
-const harvest_1 = __webpack_require__(/*! ./command/harvest */ "./src/command/harvest.ts");
-const config_1 = __webpack_require__(/*! ./config */ "./src/config.ts");
-const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
-const global_1 = __webpack_require__(/*! ./global */ "./src/global.ts");
-const upgradeController_1 = __webpack_require__(/*! ./command/upgradeController */ "./src/command/upgradeController.ts");
-const transfer_1 = __webpack_require__(/*! ./command/transfer */ "./src/command/transfer.ts");
-const pickup_1 = __webpack_require__(/*! ./command/pickup */ "./src/command/pickup.ts");
-const transferer_1 = __webpack_require__(/*! ./strategy/transferer */ "./src/strategy/transferer.ts");
-const worker_1 = __webpack_require__(/*! ./strategy/worker */ "./src/strategy/worker.ts");
-const withdraw_1 = __webpack_require__(/*! ./command/withdraw */ "./src/command/withdraw.ts");
-const build_1 = __webpack_require__(/*! ./command/build */ "./src/command/build.ts");
-const repair_1 = __webpack_require__(/*! ./command/repair */ "./src/command/repair.ts");
 function loop() {
     // 删除过期数据
     for (const key in Memory.creeps) {
@@ -686,6 +670,7 @@ function loop() {
             delete Memory.creeps[key];
         }
     }
+    exports.creepInfo = CreateCreepInfo();
     // 数据
     const strategyMap = {
         harvester: harvester_1.Harvester,
@@ -701,7 +686,6 @@ function loop() {
         build: build_1.Build,
         repair: repair_1.Repair,
     };
-    global_1.creepInfo;
     const spawn = Game.spawns['Home'];
     // 塔设置
     const towers = spawn.room.find(FIND_STRUCTURES, {
@@ -734,7 +718,7 @@ function loop() {
         let spawing = null;
         let list = ["harvester" /* Harvester */, "transferer" /* Transferer */, "worker" /* Worker */];
         for (let i = 0; i < list.length; i++) {
-            const map = global_1.creepInfo.get(list[i]);
+            const map = exports.creepInfo.get(list[i]);
             if (map) {
                 let sum = 0;
                 map.forEach(v => sum += v.length);
@@ -1073,7 +1057,7 @@ exports.Worker = void 0;
 const command_1 = __webpack_require__(/*! ../command/command */ "./src/command/command.ts");
 const moveCache_1 = __webpack_require__(/*! ../moveCache */ "./src/moveCache.ts");
 const util_1 = __webpack_require__(/*! ../util */ "./src/util.ts");
-const global_1 = __webpack_require__(/*! ../global */ "./src/global.ts");
+const __1 = __webpack_require__(/*! ../ */ "./src/index.ts");
 /**
  * 采集者策略
  */
@@ -1282,7 +1266,7 @@ const fns = [FindUpgradeTarget, FindBuildTarget, FindRepairTarget];
 function FindNextWork(creep) {
     const counts = [0, 0, 0];
     const rest = [];
-    const workers = global_1.creepInfo.get("worker" /* Worker */);
+    const workers = __1.creepInfo.get("worker" /* Worker */);
     if (workers) {
         cmds.forEach((cmd, index) => {
             const l = workers.get(cmd);
