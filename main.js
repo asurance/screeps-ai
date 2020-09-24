@@ -126,9 +126,11 @@ function Build(creep) {
                     return 0 /* OK */;
                 }
                 else {
-                    const result = creep.moveTo(target, { range: 3 });
-                    if (result !== OK) {
-                        Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                    if (creep.fatigue <= 0) {
+                        const result = creep.moveTo(target, { range: 3 });
+                        if (result !== OK) {
+                            Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                        }
                     }
                     return 1 /* Moving */;
                 }
@@ -245,9 +247,11 @@ function Harvest(creep) {
                 return 0 /* OK */;
             }
             else {
-                const result = creep.moveTo(target, { range: 1 });
-                if (result !== OK) {
-                    Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                if (creep.fatigue <= 0) {
+                    const result = creep.moveTo(target, { range: 1 });
+                    if (result !== OK) {
+                        Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                    }
                 }
                 return 1 /* Moving */;
             }
@@ -299,9 +303,11 @@ function Pickup(creep) {
                     return 0 /* OK */;
                 }
                 else {
-                    const result = creep.moveTo(target, { range: 1 });
-                    if (result !== OK) {
-                        Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                    if (creep.fatigue <= 0) {
+                        const result = creep.moveTo(target, { range: 1 });
+                        if (result !== OK) {
+                            Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                        }
                     }
                     return 1 /* Moving */;
                 }
@@ -362,9 +368,11 @@ function Repair(creep) {
                     return 0 /* OK */;
                 }
                 else {
-                    const result = creep.moveTo(target, { range: 3 });
-                    if (result !== OK) {
-                        Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                    if (creep.fatigue <= 0) {
+                        const result = creep.moveTo(target, { range: 3 });
+                        if (result !== OK) {
+                            Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                        }
                     }
                     return 1 /* Moving */;
                 }
@@ -437,9 +445,11 @@ function Transfer(creep) {
                     return 0 /* OK */;
                 }
                 else {
-                    const result = creep.moveTo(target, { range: 1 });
-                    if (result !== OK) {
-                        Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                    if (creep.fatigue <= 0) {
+                        const result = creep.moveTo(target, { range: 1 });
+                        if (result !== OK) {
+                            Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                        }
                     }
                     return 1 /* Moving */;
                 }
@@ -490,9 +500,11 @@ function UpdateController(creep) {
             return 0 /* OK */;
         }
         else {
-            const result = creep.moveTo(creep.room.controller, { range: 3 });
-            if (result !== OK) {
-                Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+            if (creep.fatigue <= 0) {
+                const result = creep.moveTo(creep.room.controller, { range: 3 });
+                if (result !== OK) {
+                    Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                }
             }
             return 1 /* Moving */;
         }
@@ -545,9 +557,11 @@ function Withdraw(creep) {
                     return 0 /* OK */;
                 }
                 else {
-                    const result = creep.moveTo(target, { range: 1 });
-                    if (result !== OK) {
-                        Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                    if (creep.fatigue <= 0) {
+                        const result = creep.moveTo(target, { range: 1 });
+                        if (result !== OK) {
+                            Game.notify(`move fail with code:${result}`, _config__WEBPACK_IMPORTED_MODULE_0__["config"].notifyInterval);
+                        }
                     }
                     return 1 /* Moving */;
                 }
