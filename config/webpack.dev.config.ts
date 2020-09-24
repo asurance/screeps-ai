@@ -5,7 +5,6 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 
 const config = {
     mode: 'development',
-    devtool: 'source-map',
     plugins: [
         new DefinePlugin({
             Mode: JSON.stringify('development')

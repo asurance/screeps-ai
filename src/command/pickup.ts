@@ -62,9 +62,11 @@ export function Pickup(creep: Creep): PickupResult {
                     }
                     return PickupResult.OK
                 } else {
-                    const result = creep.moveTo(target, { range: 1 })
-                    if (result !== OK) {
-                        Game.notify(`move fail with code:${result}`, config.notifyInterval)
+                    if (creep.fatigue <= 0) {
+                        const result = creep.moveTo(target, { range: 1 })
+                        if (result !== OK) {
+                            Game.notify(`move fail with code:${result}`, config.notifyInterval)
+                        }
                     }
                     return PickupResult.Moving
                 }
