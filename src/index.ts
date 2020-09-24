@@ -5,7 +5,6 @@ import { ICommand } from './command/command'
 import { Harvest } from './command/harvest'
 import { config } from './config'
 import { RandomObjectInList } from './util'
-import { creepInfo } from './global'
 import { UpdateController } from './command/upgradeController'
 import { Transfer } from './command/transfer'
 import { Pickup } from './command/pickup'
@@ -15,6 +14,31 @@ import { Withdraw } from './command/withdraw'
 import { Build } from './command/build'
 import { Repair } from './command/repair'
 
+/**
+ * creep信息
+ */
+export let creepInfo = CreateCreepInfo()
+
+function CreateCreepInfo(): Map<Strategy, Map<Command | null, Creep[]>> {
+    const creepInfo = new Map<Strategy, Map<Command | null, Creep[]>>()
+    // 数据预处理
+    for (const creepName in Game.creeps) {
+        const creep = Game.creeps[creepName]
+        let map = creepInfo.get(creep.memory.strategy.type)
+        if (!map) {
+            map = new Map<Command | null, Creep[]>()
+            creepInfo.set(creep.memory.strategy.type, map)
+        }
+        const key = creep.memory.cmd?.type ?? null
+        const list = map.get(key)
+        if (list) {
+            list.push(creep)
+        } else {
+            map.set(key, [creep])
+        }
+    }
+    return creepInfo
+}
 
 export function loop(): void {
     // 删除过期数据
@@ -23,6 +47,7 @@ export function loop(): void {
             delete Memory.creeps[key]
         }
     }
+    creepInfo = CreateCreepInfo()
 
     // 数据
     const strategyMap: { [key in Strategy]: IStrategy } = {
@@ -39,7 +64,6 @@ export function loop(): void {
         build: Build,
         repair: Repair,
     }
-    creepInfo
     const spawn = Game.spawns['Home']
 
     // 塔设置
