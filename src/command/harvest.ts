@@ -65,9 +65,11 @@ export function Harvest(creep: Creep): HarvestResult {
                 }
                 return HarvestResult.OK
             } else {
-                const result = creep.moveTo(target, { range: 1 })
-                if (result !== OK) {
-                    Game.notify(`move fail with code:${result}`, config.notifyInterval)
+                if (creep.fatigue <= 0) {
+                    const result = creep.moveTo(target, { range: 1 })
+                    if (result !== OK) {
+                        Game.notify(`move fail with code:${result}`, config.notifyInterval)
+                    }
                 }
                 return HarvestResult.Moving
             }

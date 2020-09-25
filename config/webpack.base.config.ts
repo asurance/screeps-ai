@@ -3,6 +3,7 @@ import { Configuration } from 'webpack'
 
 const config = {
     target: 'node',
+    devtool: 'source-map',
     entry: resolve(__dirname, '../src/index.ts'),
     module: {
         rules: [
@@ -19,6 +20,7 @@ const config = {
     output: {
         filename: 'main.js',
         path: resolve(__dirname, '../dist'),
+        libraryTarget: 'commonjs2'
     },
 } as Configuration
 

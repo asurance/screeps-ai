@@ -35,9 +35,11 @@ export function UpdateController(creep: Creep): UpdateControllerResult {
             }
             return UpdateControllerResult.OK
         } else {
-            const result = creep.moveTo(creep.room.controller!, { range: 3 })
-            if (result !== OK) {
-                Game.notify(`move fail with code:${result}`, config.notifyInterval)
+            if (creep.fatigue <= 0) {
+                const result = creep.moveTo(creep.room.controller!, { range: 3 })
+                if (result !== OK) {
+                    Game.notify(`move fail with code:${result}`, config.notifyInterval)
+                }
             }
             return UpdateControllerResult.Moving
         }

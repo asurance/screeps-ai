@@ -6,7 +6,7 @@ import { WithdrawResult } from '../command/withdraw'
 import { UpdateControllerResult } from '../command/upgradeController'
 import { BuildResult } from '../command/build'
 import { RepairResult } from '../command/repair'
-import { creepInfo } from '../global'
+import { creepInfo } from '../'
 
 /**
  * 采集者数据
