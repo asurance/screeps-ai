@@ -8,7 +8,7 @@ files.forEach(file => {
     if (fileStat.isDirectory()) {
         HandleDirectory(nextPath, nextPath)
         rmdirSync(nextPath)
-    } else if (fileStat.isFIFO()) {
+    } else if (fileStat.isFile()) {
         if (file === 'index.js') {
             renameSync(nextPath, resolve('dist', 'main.js'))
         }
