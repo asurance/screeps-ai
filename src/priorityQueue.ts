@@ -30,6 +30,7 @@ export class PriorityQueue<T> {
             if (this.priority[parent] < priority) {
                 this.data[index] = this.data[parent]
                 this.priority[index] = this.priority[parent]
+                this.order[index] = this.order[parent]
             } else {
                 break
             }
@@ -102,10 +103,7 @@ export class PriorityQueue<T> {
                     }
                     index = parent
                 }
-                this.data[index] = data
-                this.priority[index] = priority
-                this.order[index] = order
-            } else if (priority < this.priority[index]) {
+            } else {
                 while (index * 2 + 1 < this.data.length) {
                     let child = index * 2 + 1
                     if (child + 1 < this.data.length &&
@@ -123,9 +121,65 @@ export class PriorityQueue<T> {
                     }
                     index = child
                 }
-                this.data[index] = data
-                this.priority[index] = priority
-                this.order[index] = order
+            }
+            this.data[index] = data
+            this.priority[index] = priority
+            this.order[index] = order
+            return true
+        } else {
+            return false
+        }
+    }
+    /**
+     * 取消数据
+     * @param data 数据
+     */
+    cancelData(data: T): boolean {
+        let index = this.data.indexOf(data)
+        if (index >= 0) {
+            const priority = this.priority[index]
+            const last = this.data.pop()!
+            const lastPriority = this.priority.pop()!
+            const lastOrder = this.order.pop()!
+            if (this.data.length > 0 && index < this.data.length) {
+                if (lastPriority > priority) {
+                    while (index > 0) {
+                        const parent = (index - 1) >> 1
+                        if (this.priority[parent] < lastPriority ||
+                            (this.priority[parent] === lastPriority &&
+                                this.order[parent] > lastOrder)) {
+                            this.data[index] = this.data[parent]
+                            this.priority[index] = this.priority[parent]
+                            this.order[index] = this.order[parent]
+                        } else {
+                            break
+                        }
+                        index = parent
+                    }
+                } else {
+                    while (index * 2 + 1 < this.data.length) {
+                        let child = index * 2 + 1
+                        if (child + 1 < this.data.length &&
+                            (this.priority[child + 1] > this.priority[child] ||
+                                (this.priority[child + 1] === this.priority[child] &&
+                                    this.order[child + 1] < this.order[child]))) {
+                            child++
+                        }
+                        if (this.priority[child] > lastPriority ||
+                            (this.priority[child] === lastPriority &&
+                                this.order[child] < lastOrder)) {
+                            this.data[index] = this.data[child]
+                            this.priority[index] = this.priority[child]
+                            this.order[index] = this.order[child]
+                        } else {
+                            break
+                        }
+                        index = child
+                    }
+                }
+                this.data[index] = last
+                this.priority[index] = lastPriority
+                this.order[index] = lastOrder
             }
             return true
         } else {

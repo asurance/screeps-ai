@@ -3,9 +3,6 @@
  */
 const defualtConfig: Config = {
     notifyInterval: 24 * 60,
-    harvester: 2,
-    transferer: 8,
-    worker: 5,
 }
 
 /**

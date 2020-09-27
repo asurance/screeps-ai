@@ -1,4 +1,4 @@
-import { PriorityQueue } from '../priorityQueue'
+import { PriorityQueue } from './priorityQueue'
 
 export interface Task {
     type: TaskType
