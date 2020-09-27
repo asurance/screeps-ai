@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetRoomInfo = exports.GetRequiredEnergy = exports.RandomObjectInList = exports.RandomInt = void 0;
+exports.GetRequiredEnergy = exports.RandomObjectInList = exports.RandomInt = void 0;
 /**
  * 随机整数
  * @param max 最大值
@@ -36,21 +36,3 @@ function GetRequiredEnergy(body) {
     }, 0);
 }
 exports.GetRequiredEnergy = GetRequiredEnergy;
-/**
- * 获取房间信息
- * @param room 房间
- */
-function GetRoomInfo(room) {
-    const name = room.name;
-    if (name in Memory.rooms) {
-        return Memory.rooms[name];
-    }
-    else {
-        const roomData = {
-            sourceInfo: room.find(FIND_SOURCES).map(source => source.id)
-        };
-        Memory.rooms[name] = roomData;
-        return roomData;
-    }
-}
-exports.GetRoomInfo = GetRoomInfo;

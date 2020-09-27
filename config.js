@@ -6,9 +6,6 @@ exports.config = void 0;
  */
 const defualtConfig = {
     notifyInterval: 24 * 60,
-    harvester: 2,
-    transferer: 8,
-    worker: 5,
 };
 /**
  * 项目采用配置
