@@ -1,4 +1,5 @@
 import { PriorityQueue } from './priorityQueue'
+import { CanHarvestTask } from './task'
 
 interface Task {
     publisher: Id<unknown>
@@ -22,4 +23,7 @@ export function ScanRoomAndCreateTask(room: Room): void {
         }
         TaskQueue.push(upgradeControlelrTask, 0)
     }
+    sources.forEach(source => {
+        new CanHarvestTask(source)
+    })
 }

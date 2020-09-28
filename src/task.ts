@@ -1,3 +1,5 @@
+import { setTimeout } from './timer'
+
 export interface ExecuteTask {
     tick(): boolean | null
 }
@@ -32,14 +34,15 @@ export class MoveTask {
         this.target = target
         this.range = range
     }
-    execute(creep: Creep): boolean {
+    execute(creep: Creep): void {
         if (creep.pos.inRangeTo(this.target, this.range)) {
-            return true
+            this.onFinish?.()
         } else {
             creep.moveTo(this.target, { range: this.range })
-            return false
         }
     }
+    onFinish?: () => void
+    onError?: () => void
 }
 
 export class HarvestTask {
@@ -47,53 +50,57 @@ export class HarvestTask {
     constructor(source: Source) {
         this.sourceId = source.id
     }
-    execute(creep: Creep): boolean | null {
+    execute(creep: Creep): void {
         const source = Game.getObjectById(this.sourceId)
-        if (creep && source) {
+        if (source) {
             if (source.energy > 0) {
                 creep.harvest(source)
-                return false
             } else {
-                return true
+                this.onFinish?.()
             }
         } else {
-            return null
+            this.onError?.()
         }
     }
+    onFinish?: () => void
+    onError?: () => void
 }
 
-export class CanUpgradeControllerTask {
-
-}
 
 export class UpgradeControllerTask {
     creepId: Id<Creep>
     constructor(creep: Creep) {
         this.creepId = creep.id
     }
-    execute(creep: Creep): boolean | null {
+    execute(creep: Creep): void {
         if (creep.room.controller) {
             if (creep.store[RESOURCE_ENERGY] > 0) {
                 creep.upgradeController(creep.room.controller)
-                return false
             } else {
-                return true
+                this.onFinish?.()
             }
         } else {
-            return null
+            this.onError?.()
         }
     }
+    onFinish?: () => void
+    onError?: () => void
 }
 
 export class SpawnCreepTask {
-    spawnId: Id<StructureSpawn>
-    bodypart: BodyPartConstant[]
+    private creepname: string
     constructor(spawn: StructureSpawn, bodypart: BodyPartConstant[]) {
-        this.spawnId = spawn.id
-        this.bodypart = bodypart
+        this.creepname = `${spawn.name}-${Game.time}`
+        const result = spawn.spawnCreep(bodypart, this.creepname)
+        if (result === OK) {
+            setTimeout(this.onSpawnFinish, bodypart.length * CREEP_SPAWN_TIME)
+        } else {
+            this.onError?.(result)
+        }
     }
-    execute(spawn: StructureSpawn): boolean {
-        spawn.spawnCreep(this.bodypart, `${spawn.name}-${Game.time}`)
-        return true
+    private onSpawnFinish = () => {
+        this.onFinish?.(this.creepname)
     }
+    onFinish?: (creepName: string) => void
+    onError?: (code: ScreepsReturnCode) => void
 }
