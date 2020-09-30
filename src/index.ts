@@ -91,13 +91,17 @@ export function loop(): void {
     for (const name in Game.creeps) {
         const creep = Game.creeps[name]
         if (!creep.spawning) {
-            const strategyType = creep.memory.strategy.type
+            const strategy = strategyMap[creep.memory.strategy.type]
             if (creep.memory.cmd) {
                 const commandType = creep.memory.cmd.type
-                // @ts-expect-error ts暂时无法识别该类型
-                strategyMap[strategyType].callbackMap[commandType](creep, commandMap[commandType](creep))
+                if (commandType in strategy.callbackMap) {
+                    // @ts-expect-error ts暂时无法识别该类型
+                    strategy.callbackMap[commandType](creep, commandMap[commandType](creep))
+                } else {
+                    commandMap[commandType](creep)
+                }
             } else {
-                strategyMap[strategyType].start(creep)
+                strategy.start(creep)
             }
         }
     }
