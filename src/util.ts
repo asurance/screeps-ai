@@ -1,5 +1,3 @@
-import { creepInfo } from '.'
-
 /**
  * 随机整数
  * @param max 最大值
