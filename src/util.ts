@@ -1,3 +1,5 @@
+import { creepInfo } from '.'
+
 /**
  * 随机整数
  * @param max 最大值
@@ -32,19 +34,3 @@ export function GetRequiredEnergy(body: BodyPartConstant[]): number {
     }, 0)
 }
 
-/**
- * 获取房间信息
- * @param room 房间
- */
-export function GetRoomInfo(room: Room): RoomMemory {
-    const name = room.name
-    if (name in Memory.rooms) {
-        return Memory.rooms[name]
-    } else {
-        const roomData: RoomMemory = {
-            sourceInfo: room.find(FIND_SOURCES).map(source => source.id)
-        }
-        Memory.rooms[name] = roomData
-        return roomData
-    }
-}

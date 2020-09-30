@@ -1,16 +1,7 @@
 import { SetNextCommand } from '../command/command'
-import { HarvestResult } from '../command/harvest'
-import { checkMoveFail, initMoveCache, MoveCacheData } from '../moveCache'
 import { IStrategy } from './strategy'
-import { GetRequiredEnergy, GetRoomInfo, RandomObjectInList } from '../util'
-
-/**
- * 采集者数据
- */
-interface HarvesterData extends StrategyData {
-    type: Strategy.Harvester
-    moveCache: MoveCacheData
-}
+import { GetRequiredEnergy } from '../util'
+import { GetRoomInfo } from '../roomInfo'
 
 /**
  * 采集者策略
@@ -18,34 +9,18 @@ interface HarvesterData extends StrategyData {
 export const Harvester: IStrategy = {
     minEnergy: GetRequiredEnergy([MOVE, WORK]),
     create(maxEnergy: number) {
-        const count = Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work)
+        const count = Math.min(6, Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work))
         const body: BodyPartConstant[] = [MOVE, WORK]
         body.splice(0, 0, ...new Array<BodyPartConstant>(count).fill(WORK))
         return body
     },
-    initStrategy(creep: Creep) {
-        const strategy = creep.memory.strategy as HarvesterData
-        strategy.moveCache = initMoveCache(creep)
+    initStrategy() {
+        // TODO
     },
     start(creep: Creep) {
         FindNextTarget(creep)
     },
-    callbackMap: {
-        [Command.Harvest]: (creep: Creep, result: HarvestResult): void => {
-            const strategy = creep.memory.strategy as HarvesterData
-            switch (result) {
-                case HarvestResult.TargetLost:
-                case HarvestResult.TargetNeedReplace:
-                    FindNextTarget(creep)
-                    break
-                case HarvestResult.Moving:
-                    if (checkMoveFail(creep, strategy.moveCache)) {
-                        FindNextTarget(creep)
-                    }
-                    break
-            }
-        }
-    },
+    callbackMap: {},
 }
 
 /**
@@ -55,12 +30,14 @@ export const Harvester: IStrategy = {
  */
 function FindNextTarget(creep: Creep): boolean {
     const roomInfos = GetRoomInfo(creep.room)
-    const sourceId = RandomObjectInList(roomInfos.sourceInfo)
-    if (sourceId) {
-        const target = Game.getObjectById(sourceId)
-        if (target) {
-            SetNextCommand(Command.Harvest, creep, target)
-            return true
+    for (let i = 0; i < roomInfos.sourceInfo.length; i++) {
+        if (roomInfos.creepInfo[i] === null) {
+            const target = Game.getObjectById(roomInfos.sourceInfo[i])
+            if (target) {
+                SetNextCommand(Command.Harvest, creep, target)
+                roomInfos.creepInfo[i] = creep.name
+                return true
+            }
         }
     }
     creep.say('闲置中')

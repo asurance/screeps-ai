@@ -5,6 +5,7 @@ import { ICommand } from './command/command'
 import { Harvest } from './command/harvest'
 import { config } from './config'
 import { RandomObjectInList } from './util'
+import { OnCreepDead } from './roomInfo'
 import { UpdateController } from './command/upgradeController'
 import { Transfer } from './command/transfer'
 import { Pickup } from './command/pickup'
@@ -41,10 +42,19 @@ function CreateCreepInfo(): Map<Strategy, Map<Command | null, Creep[]>> {
 }
 
 export function loop(): void {
+
+    const spawn = Game.spawns['Home']
+
+    // 回收多余cpu资源
+    if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
+        Game.cpu.generatePixel()
+    }
+
     // 删除过期数据
     for (const key in Memory.creeps) {
         if (!(key in Game.creeps)) {
             delete Memory.creeps[key]
+            OnCreepDead(spawn.room.name, key)
         }
     }
     creepInfo = CreateCreepInfo()
@@ -64,7 +74,6 @@ export function loop(): void {
         build: Build,
         repair: Repair,
     }
-    const spawn = Game.spawns['Home']
 
     // 塔设置
     const towers = spawn.room.find(FIND_STRUCTURES, {

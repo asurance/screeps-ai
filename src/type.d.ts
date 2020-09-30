@@ -28,13 +28,6 @@ interface Memory {
 }
 
 /**
- * 房间数据
- */
-interface RoomMemory {
-    sourceInfo: Id<Source>[]
-}
-
-/**
  * 策略数据
  */
 interface StrategyData {
