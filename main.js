@@ -629,6 +629,7 @@ const harvester_1 = __webpack_require__(/*! ./strategy/harvester */ "./src/strat
 const harvest_1 = __webpack_require__(/*! ./command/harvest */ "./src/command/harvest.ts");
 const config_1 = __webpack_require__(/*! ./config */ "./src/config.ts");
 const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
+const roomInfo_1 = __webpack_require__(/*! ./roomInfo */ "./src/roomInfo.ts");
 const upgradeController_1 = __webpack_require__(/*! ./command/upgradeController */ "./src/command/upgradeController.ts");
 const transfer_1 = __webpack_require__(/*! ./command/transfer */ "./src/command/transfer.ts");
 const pickup_1 = __webpack_require__(/*! ./command/pickup */ "./src/command/pickup.ts");
@@ -664,10 +665,16 @@ function CreateCreepInfo() {
     return creepInfo;
 }
 function loop() {
+    const spawn = Game.spawns['Home'];
+    // 回收多余cpu资源
+    if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
+        Game.cpu.generatePixel();
+    }
     // 删除过期数据
     for (const key in Memory.creeps) {
         if (!(key in Game.creeps)) {
             delete Memory.creeps[key];
+            roomInfo_1.OnCreepDead(spawn.room.name, key);
         }
     }
     exports.creepInfo = CreateCreepInfo();
@@ -686,7 +693,6 @@ function loop() {
         build: build_1.Build,
         repair: repair_1.Repair,
     };
-    const spawn = Game.spawns['Home'];
     // 塔设置
     const towers = spawn.room.find(FIND_STRUCTURES, {
         filter: (structure) => structure.structureType === STRUCTURE_TOWER
@@ -843,6 +849,56 @@ Game.Restart = () => {
 
 /***/ }),
 
+/***/ "./src/roomInfo.ts":
+/*!*************************!*\
+  !*** ./src/roomInfo.ts ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OnCreepDead = exports.GetRoomInfo = void 0;
+const roomInfo = new Map();
+/**
+ * 获取房间信息
+ * @param room 房间
+ */
+function GetRoomInfo(room) {
+    let info = roomInfo.get(room.name);
+    if (!info) {
+        const sourceInfo = room.find(FIND_SOURCES).map(source => source.id);
+        info = {
+            sourceInfo,
+            creepInfo: new Array(sourceInfo.length).fill(null),
+        };
+        roomInfo.set(room.name, info);
+    }
+    return info;
+}
+exports.GetRoomInfo = GetRoomInfo;
+function OnCreepDead(roomName, creepName) {
+    const info = roomInfo.get(roomName);
+    if (info) {
+        const index = info.creepInfo.indexOf(creepName);
+        if (index >= 0) {
+            info.creepInfo.splice(index, 1);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+}
+exports.OnCreepDead = OnCreepDead;
+
+
+/***/ }),
+
 /***/ "./src/strategy/harvester.ts":
 /*!***********************************!*\
   !*** ./src/strategy/harvester.ts ***!
@@ -855,42 +911,26 @@ Game.Restart = () => {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Harvester = void 0;
 const command_1 = __webpack_require__(/*! ../command/command */ "./src/command/command.ts");
-const moveCache_1 = __webpack_require__(/*! ../moveCache */ "./src/moveCache.ts");
 const util_1 = __webpack_require__(/*! ../util */ "./src/util.ts");
+const roomInfo_1 = __webpack_require__(/*! ../roomInfo */ "./src/roomInfo.ts");
 /**
  * 采集者策略
  */
 exports.Harvester = {
     minEnergy: util_1.GetRequiredEnergy([MOVE, WORK]),
     create(maxEnergy) {
-        const count = Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work);
+        const count = Math.min(6, Math.floor((maxEnergy - this.minEnergy) / BODYPART_COST.work));
         const body = [MOVE, WORK];
         body.splice(0, 0, ...new Array(count).fill(WORK));
         return body;
     },
-    initStrategy(creep) {
-        const strategy = creep.memory.strategy;
-        strategy.moveCache = moveCache_1.initMoveCache(creep);
+    initStrategy() {
+        // TODO
     },
     start(creep) {
         FindNextTarget(creep);
     },
-    callbackMap: {
-        ["harvest" /* Harvest */]: (creep, result) => {
-            const strategy = creep.memory.strategy;
-            switch (result) {
-                case 2 /* TargetLost */:
-                case 3 /* TargetNeedReplace */:
-                    FindNextTarget(creep);
-                    break;
-                case 1 /* Moving */:
-                    if (moveCache_1.checkMoveFail(creep, strategy.moveCache)) {
-                        FindNextTarget(creep);
-                    }
-                    break;
-            }
-        }
-    },
+    callbackMap: {},
 };
 /**
  * 找到下一个采集目标
@@ -898,13 +938,15 @@ exports.Harvester = {
  * @return 是否成功
  */
 function FindNextTarget(creep) {
-    const roomInfos = util_1.GetRoomInfo(creep.room);
-    const sourceId = util_1.RandomObjectInList(roomInfos.sourceInfo);
-    if (sourceId) {
-        const target = Game.getObjectById(sourceId);
-        if (target) {
-            command_1.SetNextCommand("harvest" /* Harvest */, creep, target);
-            return true;
+    const roomInfos = roomInfo_1.GetRoomInfo(creep.room);
+    for (let i = 0; i < roomInfos.sourceInfo.length; i++) {
+        if (roomInfos.creepInfo[i] === null) {
+            const target = Game.getObjectById(roomInfos.sourceInfo[i]);
+            if (target) {
+                command_1.SetNextCommand("harvest" /* Harvest */, creep, target);
+                roomInfos.creepInfo[i] = creep.name;
+                return true;
+            }
         }
     }
     creep.say('闲置中');
@@ -1316,7 +1358,7 @@ function FindNextWork(creep) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetRoomInfo = exports.GetRequiredEnergy = exports.RandomObjectInList = exports.RandomInt = void 0;
+exports.GetRequiredEnergy = exports.RandomObjectInList = exports.RandomInt = void 0;
 /**
  * 随机整数
  * @param max 最大值
@@ -1352,24 +1394,6 @@ function GetRequiredEnergy(body) {
     }, 0);
 }
 exports.GetRequiredEnergy = GetRequiredEnergy;
-/**
- * 获取房间信息
- * @param room 房间
- */
-function GetRoomInfo(room) {
-    const name = room.name;
-    if (name in Memory.rooms) {
-        return Memory.rooms[name];
-    }
-    else {
-        const roomData = {
-            sourceInfo: room.find(FIND_SOURCES).map(source => source.id)
-        };
-        Memory.rooms[name] = roomData;
-        return roomData;
-    }
-}
-exports.GetRoomInfo = GetRoomInfo;
 
 
 /***/ })
