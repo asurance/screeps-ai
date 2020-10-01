@@ -701,7 +701,7 @@ function loop() {
     towers.forEach(tower => {
         const hostTile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if (hostTile) {
-            hostTile.attack(hostTile);
+            tower.attack(hostTile);
         }
     });
     // creep操作
