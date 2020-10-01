@@ -999,8 +999,8 @@ exports.Transferer = {
             switch (result) {
                 case 3 /* TargetLost */:
                 case 4 /* TargetNeedReplace */:
-                    if (!FindPickupTarget(creep) && creep.store.energy > 0) {
-                        FindTransferTarget(creep);
+                    if (creep.store.energy === 0 || !FindTransferTarget(creep)) {
+                        FindPickupTarget(creep);
                     }
                     break;
                 case 1 /* Moving */:
@@ -1018,7 +1018,7 @@ exports.Transferer = {
             switch (result) {
                 case 3 /* TargetLost */:
                 case 4 /* TargetNeedReplace */:
-                    if (!FindTransferTarget(creep)) {
+                    if (creep.store.energy === 0 || !FindTransferTarget(creep)) {
                         FindPickupTarget(creep);
                     }
                     break;
