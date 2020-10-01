@@ -674,7 +674,7 @@ function loop() {
     for (const key in Memory.creeps) {
         if (!(key in Game.creeps)) {
             delete Memory.creeps[key];
-            roomInfo_1.OnCreepDead(spawn.room.name, key);
+            roomInfo_1.OnCreepDead(spawn.room, key);
         }
     }
     exports.creepInfo = CreateCreepInfo();
@@ -865,26 +865,25 @@ Game.Restart = () => {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OnCreepDead = exports.GetRoomInfo = void 0;
-const roomInfo = new Map();
 /**
  * 获取房间信息
  * @param room 房间
  */
 function GetRoomInfo(room) {
-    let info = roomInfo.get(room.name);
+    let info = room.memory;
     if (!info) {
         const sourceInfo = room.find(FIND_SOURCES).map(source => source.id);
         info = {
             sourceInfo,
             creepInfo: new Array(sourceInfo.length).fill(null),
         };
-        roomInfo.set(room.name, info);
+        room.memory = info;
     }
     return info;
 }
 exports.GetRoomInfo = GetRoomInfo;
-function OnCreepDead(roomName, creepName) {
-    const info = roomInfo.get(roomName);
+function OnCreepDead(room, creepName) {
+    const info = room.memory;
     if (info) {
         const index = info.creepInfo.indexOf(creepName);
         if (index >= 0) {
