@@ -881,7 +881,7 @@ function OnCreepDead(room, creepName) {
     if (room.memory.creepInfo) {
         const index = room.memory.creepInfo.indexOf(creepName);
         if (index >= 0) {
-            room.memory.creepInfo.splice(index, 1);
+            room.memory.creepInfo[index] = null;
             return true;
         }
         else {
