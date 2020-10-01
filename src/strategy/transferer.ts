@@ -44,8 +44,8 @@ export const Transferer: IStrategy = {
             switch (result) {
                 case PickupResult.TargetLost:
                 case PickupResult.TargetNeedReplace:
-                    if (!FindPickupTarget(creep) && creep.store.energy > 0) {
-                        FindTransferTarget(creep)
+                    if (creep.store.energy === 0 || !FindTransferTarget(creep)) {
+                        FindPickupTarget(creep)
                     }
                     break
                 case PickupResult.Moving:
@@ -63,7 +63,7 @@ export const Transferer: IStrategy = {
             switch (result) {
                 case TransferResult.TargetLost:
                 case TransferResult.TargetNeedReplace:
-                    if (!FindTransferTarget(creep)) {
+                    if (creep.store.energy === 0 || !FindTransferTarget(creep)) {
                         FindPickupTarget(creep)
                     }
                     break
