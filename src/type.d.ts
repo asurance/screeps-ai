@@ -27,6 +27,11 @@ interface Memory {
     config?: Partial<Config>
 }
 
+interface RoomMemory {
+    sourceInfo: Id<Source>[]
+    creepInfo: (string | null)[],
+}
+
 /**
  * 策略数据
  */

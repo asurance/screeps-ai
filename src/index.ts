@@ -54,7 +54,7 @@ export function loop(): void {
     for (const key in Memory.creeps) {
         if (!(key in Game.creeps)) {
             delete Memory.creeps[key]
-            OnCreepDead(spawn.room.name, key)
+            OnCreepDead(spawn.room, key)
         }
     }
     creepInfo = CreateCreepInfo()
