@@ -81,6 +81,20 @@ export function loop(): void {
             && structure.my
     }) as StructureTower[]
     towers.forEach(tower => {
+        if (tower.store.energy >= TOWER_CAPACITY / 2) {
+            const creep = RandomObjectInList(tower.pos.findInRange(FIND_CREEPS, TOWER_OPTIMAL_RANGE, {
+                filter: creep => creep.hits < creep.hitsMax
+            }))
+            if (creep) {
+                tower.heal(creep)
+            }
+            const structure = RandomObjectInList(tower.pos.findInRange(FIND_STRUCTURES, TOWER_OPTIMAL_RANGE, {
+                filter: structure => structure.hits < structure.hitsMax
+            }))
+            if (structure) {
+                tower.repair(structure)
+            }
+        }
         const hostTile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS)
         if (hostTile) {
             tower.attack(hostTile)
