@@ -15,13 +15,13 @@ function GenerateRoomInfomap() {
         const spawn = Game.spawns[spawnName]
         const roomInfo = map.get(spawn.room.name)!
         roomInfo.spawn.push(spawn.name)
-        // TODO spawn.memory.roomname = spawn.room.name
+        spawn.memory.roomName = spawn.room.name
     }
     for (const creepName in Game.creeps) {
         const creep = Game.creeps[creepName]
         const roomInfo = map.get(creep.room.name)!
         roomInfo.creep.push(creep.name)
-        // TODO creep.memory.roomname = creep.room.name
+        creep.memory.roomName = creep.room.name
     }
     return map
 }

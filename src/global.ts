@@ -1,0 +1,1 @@
+export const obstacles = new Set<string>(OBSTACLE_OBJECT_TYPES)

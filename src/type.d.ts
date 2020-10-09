@@ -15,6 +15,14 @@ interface Memory {
     config?: Partial<Config>
 }
 
+interface CreepMemory {
+    roomName: string
+}
+
+interface SpawnMemory {
+    roomName: string
+}
+
 /**
  * 去掉tuple类型第一个参数
  */
