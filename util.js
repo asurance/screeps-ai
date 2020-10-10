@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetRequiredEnergy = exports.RandomObjectInList = exports.RandomInt = void 0;
+exports.LookForInRange = exports.GetRequiredEnergy = exports.RandomObjectInList = exports.RandomInt = void 0;
 /**
  * 随机整数
  * @param max 最大值
@@ -36,3 +36,16 @@ function GetRequiredEnergy(body) {
     }, 0);
 }
 exports.GetRequiredEnergy = GetRequiredEnergy;
+function LookForInRange(type, obj, range) {
+    if (obj.room) {
+        const top = Math.max(obj.pos.y - range, 0);
+        const left = Math.max(obj.pos.x - range, 0);
+        const bottom = Math.min(obj.pos.y + range, 49);
+        const right = Math.min(obj.pos.x + range, 49);
+        return obj.room.lookForAtArea(type, top, left, bottom, right, true);
+    }
+    else {
+        return [];
+    }
+}
+exports.LookForInRange = LookForInRange;
