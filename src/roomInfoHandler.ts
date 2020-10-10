@@ -2,32 +2,10 @@ export interface RoomInfo {
     spawn: string[]
     creep: string[]
 }
-
-export const RoomInfoMap = GenerateRoomInfomap()
-
-function GenerateRoomInfomap() {
-    const map = new Map<string, RoomInfo>()
-    for (const roomName in Game.rooms) {
-        const room = Game.rooms[roomName]
-        map.set(room.name, { spawn: [], creep: [] })
-    }
-    for (const spawnName in Game.spawns) {
-        const spawn = Game.spawns[spawnName]
-        const roomInfo = map.get(spawn.room.name)!
-        roomInfo.spawn.push(spawn.name)
-        spawn.memory.roomName = spawn.room.name
-    }
-    for (const creepName in Game.creeps) {
-        const creep = Game.creeps[creepName]
-        const roomInfo = map.get(creep.room.name)!
-        roomInfo.creep.push(creep.name)
-        creep.memory.roomName = creep.room.name
-    }
-    return map
-}
-
 export class RoomInfoHandler {
     private infoMap = new Map<string, RoomInfo>()
+    private creepDeadCB = new Map<string, (() => void)[]>()
+    private spawnDeadCB = new Map<string, (() => void)[]>()
     constructor() {
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName]
@@ -57,6 +35,11 @@ export class RoomInfoHandler {
                         roomInfo.creep.splice(index, 1)
                     }
                 }
+                const cblist = this.creepDeadCB.get(creepName)
+                if (cblist) {
+                    cblist.forEach(f => f())
+                    this.creepDeadCB.delete(creepName)
+                }
                 delete Memory.creeps[creepName]
             }
         }
@@ -70,6 +53,11 @@ export class RoomInfoHandler {
                         roomInfo.spawn.splice(index, 1)
                     }
                 }
+                const cblist = this.spawnDeadCB.get(spawnName)
+                if (cblist) {
+                    cblist.forEach(f => f())
+                    this.creepDeadCB.delete(spawnName)
+                }
                 delete Memory.spawns[spawnName]
             }
         }
@@ -77,6 +65,22 @@ export class RoomInfoHandler {
     getRoomInfo(roomName: string): Readonly<RoomInfo> | null {
         return this.infoMap.get(roomName) ?? null
     }
+    onCreepDead(creepName: string, cb: () => void): void {
+        const cblist = this.creepDeadCB.get(creepName)
+        if (cblist) {
+            cblist.push(cb)
+        } else {
+            this.creepDeadCB.set(creepName, [cb])
+        }
+    }
+    onSpawnDead(spawnName: string, cb: () => void): void {
+        const cblist = this.spawnDeadCB.get(spawnName)
+        if (cblist) {
+            cblist.push(cb)
+        } else {
+            this.creepDeadCB.set(spawnName, [cb])
+        }
+    }
 }
 
-export const roomInfo = new RoomInfoHandler()
+export const roomInfoHandler = new RoomInfoHandler()

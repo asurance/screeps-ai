@@ -1,11 +1,11 @@
-import { roomInfo } from './roomInfo'
+import { roomInfoHandler } from './roomInfoHandler'
 import { Tick } from './timer'
 
 export function loop(): void {
 
     Tick()
 
-    roomInfo.update()
+    roomInfoHandler.update()
 
     // 回收多余cpu资源
     if (Game.cpu.bucket >= PIXEL_CPU_COST + 500 * 2) {
