@@ -1,11 +1,11 @@
 import { obstacles } from './global'
-import { LookForInRange } from './roomPatch'
-import { Task } from './TaskCenter'
+import { LookForInRange } from './util'
+import { Task } from './taskCenter'
 
 export class HarvestTask implements Task {
     sourceId: Id<Source>
     priority: number;
-    targetPos: RoomPosition[]
+    maxCount: number;
     activeCreeps: Id<Creep>[] = []
 
     constructor(source: Source) {
@@ -16,12 +16,13 @@ export class HarvestTask implements Task {
         const terrain = LookForInRange('terrain', source, 1)
             .filter(t => t.terrain !== 'wall'
                 && structure.every(s => s.x !== t.x && s.y !== t.y))
-        this.targetPos = terrain.map(t => new RoomPosition(t.x, t.y, source.room.name))
+        this.maxCount = terrain.length
     }
 
     query(creep: Creep): boolean {
         throw new Error('Method not implemented.')
     }
+
     assign(creep: Creep): boolean {
         throw new Error('Method not implemented.')
     }
