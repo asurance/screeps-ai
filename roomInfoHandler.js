@@ -1,30 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.roomInfo = exports.RoomInfoHandler = exports.RoomInfoMap = void 0;
-exports.RoomInfoMap = GenerateRoomInfomap();
-function GenerateRoomInfomap() {
-    const map = new Map();
-    for (const roomName in Game.rooms) {
-        const room = Game.rooms[roomName];
-        map.set(room.name, { spawn: [], creep: [] });
-    }
-    for (const spawnName in Game.spawns) {
-        const spawn = Game.spawns[spawnName];
-        const roomInfo = map.get(spawn.room.name);
-        roomInfo.spawn.push(spawn.name);
-        spawn.memory.roomName = spawn.room.name;
-    }
-    for (const creepName in Game.creeps) {
-        const creep = Game.creeps[creepName];
-        const roomInfo = map.get(creep.room.name);
-        roomInfo.creep.push(creep.name);
-        creep.memory.roomName = creep.room.name;
-    }
-    return map;
-}
+exports.roomInfoHandler = exports.RoomInfoHandler = void 0;
 class RoomInfoHandler {
     constructor() {
         this.infoMap = new Map();
+        this.creepDeadCB = new Map();
+        this.spawnDeadCB = new Map();
         for (const roomName in Game.rooms) {
             const room = Game.rooms[roomName];
             this.infoMap.set(room.name, { spawn: [], creep: [] });
@@ -53,6 +34,11 @@ class RoomInfoHandler {
                         roomInfo.creep.splice(index, 1);
                     }
                 }
+                const cblist = this.creepDeadCB.get(creepName);
+                if (cblist) {
+                    cblist.forEach(f => f());
+                    this.creepDeadCB.delete(creepName);
+                }
                 delete Memory.creeps[creepName];
             }
         }
@@ -66,6 +52,11 @@ class RoomInfoHandler {
                         roomInfo.spawn.splice(index, 1);
                     }
                 }
+                const cblist = this.spawnDeadCB.get(spawnName);
+                if (cblist) {
+                    cblist.forEach(f => f());
+                    this.creepDeadCB.delete(spawnName);
+                }
                 delete Memory.spawns[spawnName];
             }
         }
@@ -74,6 +65,24 @@ class RoomInfoHandler {
         var _a;
         return (_a = this.infoMap.get(roomName)) !== null && _a !== void 0 ? _a : null;
     }
+    onCreepDead(creepName, cb) {
+        const cblist = this.creepDeadCB.get(creepName);
+        if (cblist) {
+            cblist.push(cb);
+        }
+        else {
+            this.creepDeadCB.set(creepName, [cb]);
+        }
+    }
+    onSpawnDead(spawnName, cb) {
+        const cblist = this.spawnDeadCB.get(spawnName);
+        if (cblist) {
+            cblist.push(cb);
+        }
+        else {
+            this.creepDeadCB.set(spawnName, [cb]);
+        }
+    }
 }
 exports.RoomInfoHandler = RoomInfoHandler;
-exports.roomInfo = new RoomInfoHandler();
+exports.roomInfoHandler = new RoomInfoHandler();
