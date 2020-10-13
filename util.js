@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LookForInRange = exports.GetRequiredEnergy = exports.RandomObjectInList = exports.RandomInt = void 0;
+exports.MoveToTarget = exports.LookForInRange = exports.GetRequiredEnergy = exports.RandomObjectInList = exports.RandomInt = void 0;
 /**
  * 随机整数
  * @param max 最大值
@@ -49,3 +49,16 @@ function LookForInRange(type, obj, range) {
     }
 }
 exports.LookForInRange = LookForInRange;
+function MoveToTarget(creep, target, range, inRange) {
+    const distance = creep.pos.getRangeTo(target);
+    if (distance <= range) {
+        inRange();
+    }
+    else {
+        const result = creep.moveTo(target, { noPathFinding: true });
+        if (result === ERR_NOT_FOUND) {
+            creep.moveTo(target, { reusePath: range, range, serializeMemory: false });
+        }
+    }
+}
+exports.MoveToTarget = MoveToTarget;
