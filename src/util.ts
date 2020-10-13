@@ -47,3 +47,15 @@ export function LookForInRange<T extends keyof AllLookAtTypes>(
         return []
     }
 }
+
+export function MoveToTarget(creep: Creep, target: RoomPosition, range: number, inRange: () => void): void {
+    const distance = creep.pos.getRangeTo(target)
+    if (distance <= range) {
+        inRange()
+    } else {
+        const result = creep.moveTo(target, { noPathFinding: true })
+        if (result === ERR_NOT_FOUND) {
+            creep.moveTo(target, { reusePath: range, range, serializeMemory: false })
+        }
+    }
+}
