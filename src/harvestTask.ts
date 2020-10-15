@@ -1,8 +1,7 @@
 import { obstacles } from './global'
 import { LookForInRange } from './util'
-import { Task } from './taskCenter'
 
-export class HarvestTask implements Task {
+export class HarvestTask {
     sourceId: Id<Source>
     priority: number;
     maxCount: number;
@@ -19,16 +18,21 @@ export class HarvestTask implements Task {
         const terrain = LookForInRange('terrain', source, 1)
             .filter(t => t.terrain !== 'wall'
                 && structure.every(s => s.x !== t.x && s.y !== t.y))
-        source.room.createConstructionSite(terrain[0].x, terrain[0].y, STRUCTURE_CONTAINER)
-        const site = source.room.lookForAt('constructionSite', terrain[0].x, terrain[0].y)
-        this.containerSite = site[0].id
+        if (!structure.some(s => {
+            if (s.structure.structureType === STRUCTURE_CONTAINER) {
+                this.container = (s.structure as StructureContainer).id
+                return true
+            } else {
+                return false
+            }
+        })) {
+            const result = source.room.createConstructionSite(terrain[0].x, terrain[0].y, STRUCTURE_CONTAINER)
+            if (result === OK) {
+                const site = source.room.lookForAt('constructionSite', terrain[0].x, terrain[0].y)
+                    .filter(s => s.structureType === STRUCTURE_CONTAINER)
+                this.containerSite = site[0].id
+            }
+        }
         this.maxCount = terrain.length
     }
-    query(creep: Creep): boolean {
-        throw new Error('Method not implemented.')
-    }
-    assign(creep: Creep): boolean {
-        throw new Error('Method not implemented.')
-    }
-
 }

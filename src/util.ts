@@ -55,7 +55,7 @@ export function MoveToTarget(creep: Creep, target: RoomPosition, range: number, 
     } else {
         const result = creep.moveTo(target, { noPathFinding: true })
         if (result === ERR_NOT_FOUND) {
-            creep.moveTo(target, { reusePath: range, range, serializeMemory: false })
+            creep.moveTo(target, { reusePath: Math.floor(range / 2), range, serializeMemory: false })
         }
     }
 }

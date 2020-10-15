@@ -3,6 +3,7 @@ import { MoveToTarget } from './util'
 
 export class Harvester {
     readonly creeep: string
+    private harvesting = true
     private task: HarvestTask
     constructor(creep: Creep, task: HarvestTask) {
         this.creeep = creep.name
@@ -11,7 +12,26 @@ export class Harvester {
     tick(): void {
         if (this.creeep in Game.creeps) {
             const creep = Game.creeps[this.creeep]
-            if (creep.store.energy > 0) {
+            if (this.harvesting) {
+                if (creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
+                    this.harvesting = false
+                }
+            } else {
+                if (creep.store.energy === 0) {
+                    this.harvesting = true
+                }
+            }
+            if (this.harvesting) {
+                const source = Game.getObjectById(this.task.sourceId)
+                if (source) {
+                    MoveToTarget(creep, source.pos, 1, () => {
+                        creep.harvest(source)
+                    })
+                }
+            } else {
+                if (this.task.containerSite) {
+                    const site = Game.getObjectById(this.task.containerSite)
+                }
                 const structures = creep.room.lookForAt('structure', this.task.containerX, this.task.containerY)
                 for (const structure of structures) {
                     if (structure.structureType === STRUCTURE_CONTAINER) {
@@ -27,13 +47,6 @@ export class Harvester {
                         }
                         break
                     }
-                }
-            } else {
-                const source = Game.getObjectById(this.task.sourceId)
-                if (source) {
-                    MoveToTarget(creep, source.pos, 1, () => {
-                        creep.harvest(source)
-                    })
                 }
             }
         }
