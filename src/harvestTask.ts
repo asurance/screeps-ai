@@ -1,5 +1,5 @@
-import { obstacles } from './global'
-import { LookForInRange } from './util'
+import { obstacles } from './util/global'
+import { LookForInRange } from './util/util'
 
 export class HarvestTask {
     sourceId: Id<Source>

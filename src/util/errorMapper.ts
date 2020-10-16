@@ -1,13 +1,23 @@
 import { SourceMapConsumer } from 'source-map'
 
+/**
+ * source map 消费缓存
+ */
 let getConsumer = () => {
     const consumer = new SourceMapConsumer(require('main.js.map'))
     getConsumer = () => consumer
     return consumer
 }
 
+/**
+ * 错误缓存
+ */
 const cache: { [key: string]: string } = {}
 
+/**
+ * 追踪Error调用
+ * @param error 错误
+ */
 function SourceMappedStackTrace(error: Error): string {
     if (!error.stack) return ''
     if (error.stack in cache) return cache[error.stack]
@@ -29,6 +39,9 @@ function SourceMappedStackTrace(error: Error): string {
     return stackInfo
 }
 
+/**
+ * 包Loop
+ */
 export function WrapLoop(loop: () => void): () => void {
     return () => {
         try {

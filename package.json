@@ -3,7 +3,9 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "upload": "cross-env TS_NODE_PROJECT=config/tsconfig.json webpack --config config/webpack.config.ts && grunt"
+        "build": "cross-env TS_NODE_PROJECT=config/tsconfig.json webpack --config config/webpack.config.ts",
+        "deploy": "grunt",
+        "upload": "npm run build && npm run deploy"
     },
     "devDependencies": {
         "@types/grunt": "^0.4.25",

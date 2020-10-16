@@ -1,20 +1,4 @@
-/**
- * 配置
- */
-interface Config {
-    /**
-     * 提醒间隔
-     */
-    notifyInterval: number
-}
-
-interface Memory {
-    /**
-     * 配置
-     */
-    config?: Partial<Config>
-}
-
+/* eslint-disable @typescript-eslint/prefer-namespace-keyword */
 interface CreepMemory {
     roomName: string
 }
@@ -27,3 +11,9 @@ interface SpawnMemory {
  * 去掉tuple类型第一个参数
  */
 type Tail<T extends unknown[]> = T extends [unknown, ...argv: infer K] ? K : never
+
+declare module NodeJS {
+    interface Global {
+        GenerateStats(): void
+    }
+}

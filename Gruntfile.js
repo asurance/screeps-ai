@@ -55,5 +55,5 @@ module.exports = function (grunt) {
     })
 
     // Combine the above into a default task
-    grunt.registerTask('default', ['copy:screeps']);
+    grunt.registerTask('default', ['copy:screeps', 'screeps']);
 }

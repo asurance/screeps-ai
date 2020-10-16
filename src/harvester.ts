@@ -1,5 +1,5 @@
 import { HarvestTask } from './harvestTask'
-import { MoveToTarget } from './util'
+import { MoveToTarget } from './util/util'
 
 export class Harvester {
     readonly creeep: string

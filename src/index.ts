@@ -1,6 +1,8 @@
 import { roomInfoHandler } from './roomInfoHandler'
 import { Tick } from './timer'
 import { WrapLoop } from './util/errorMapper'
+import { CheckAndGeneratePixel } from './util/pixel'
+import './patch'
 
 export const loop = WrapLoop(() => {
 
@@ -8,8 +10,5 @@ export const loop = WrapLoop(() => {
 
     roomInfoHandler.update()
 
-    // 回收多余cpu资源
-    if (Game.cpu.bucket >= PIXEL_CPU_COST + 500 * 2) {
-        Game.cpu.generatePixel()
-    }
+    CheckAndGeneratePixel()
 })

@@ -24,9 +24,13 @@ const config = {
     resolve: {
         extensions: ['.ts', '.js']
     },
+    externals: [
+        'main.js.map'
+    ],
     output: {
         filename: 'main.js',
-        path: resolve(__dirname, '../dist')
+        path: resolve(__dirname, '../dist'),
+        libraryTarget: 'commonjs',
     },
     plugins: [
         new CleanWebpackPlugin(),
