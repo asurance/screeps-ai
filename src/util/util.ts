@@ -48,14 +48,32 @@ export function LookForInRange<T extends keyof AllLookAtTypes>(
     }
 }
 
-export function MoveToTarget(creep: Creep, target: RoomPosition, range: number, inRange: () => void): void {
+export function SerializeRoomPos(pos: RoomPosition | { x: number, y: number }): number {
+    return pos.x + pos.y * 50
+}
+
+export function DeserializeRoomPos(pos: number, roomName: string): RoomPosition {
+    return new RoomPosition(pos % 50, Math.floor(pos / 50), roomName)
+}
+
+export function SetMoveTarget(creep: Creep, pos: RoomPosition | { x: number, y: number } | number, range: number): void {
+    creep.memory.moving = {
+        pos: typeof pos === 'number' ? pos : SerializeRoomPos(pos),
+        range
+    }
+}
+
+export function MoveCreep(creep: Creep): boolean {
+    const target = DeserializeRoomPos(creep.memory.moving!.pos, creep.room.name)
+    const range = creep.memory.moving!.range
     const distance = creep.pos.getRangeTo(target)
     if (distance <= range) {
-        inRange()
+        return true
     } else {
         const result = creep.moveTo(target, { noPathFinding: true })
         if (result === ERR_NOT_FOUND) {
-            creep.moveTo(target, { reusePath: Math.floor(range / 2), range, serializeMemory: false })
+            creep.moveTo(target, { reusePath: Math.floor(range / 2), range, serializeMemory: false, ignoreCreeps: range > 6 })
         }
+        return false
     }
 }

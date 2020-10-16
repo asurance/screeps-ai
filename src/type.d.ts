@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/prefer-namespace-keyword */
 interface CreepMemory {
     roomName: string
+    role: string
+    moving?: {
+        pos: number
+        range: number
+    }
 }
 
 interface SpawnMemory {
@@ -15,5 +20,6 @@ type Tail<T extends unknown[]> = T extends [unknown, ...argv: infer K] ? K : nev
 declare module NodeJS {
     interface Global {
         GenerateStats(): void
+        GenerateHarvester(): void
     }
 }
