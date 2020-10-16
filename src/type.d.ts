@@ -1,4 +1,11 @@
 /* eslint-disable @typescript-eslint/prefer-namespace-keyword */
+
+interface Memory {
+    tasks: {
+        [key: string]: unknown
+    }
+}
+
 interface CreepMemory {
     roomName: string
     role: string
@@ -10,6 +17,7 @@ interface CreepMemory {
 
 interface SpawnMemory {
     roomName: string
+    task?: string[]
 }
 
 /**

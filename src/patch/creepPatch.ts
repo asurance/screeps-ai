@@ -1,21 +1,17 @@
-import { GetRequiredEnergy } from '../util/util'
+import { SpawnTask } from '../spawnTask'
 
 global.GenerateHarvester = () => {
     for (const spawnName in Game.spawns) {
         const spawn = Game.spawns[spawnName]
-        const body = [WORK, CARRY, MOVE]
-        if (spawn.room.energyAvailable >= GetRequiredEnergy(body)) {
-            const result = spawn.spawnCreep(body, `${spawn.name}-harvester-${Game.time}`, {
-                memory: {
-                    roomName: spawn.room.name,
-                    role: '',
-                }
-            })
-            if (result !== OK) {
-                console.log(`Error: ${result}`)
-            }
+        const task: SpawnTask = {
+            body: [WORK, CARRY, MOVE],
+            role: 'harvester'
+        }
+        Memory.tasks[Game.time] = task
+        if (spawn.memory.task) {
+            spawn.memory.task.push(`${Game.time}`)
         } else {
-            console.log('Requried more energy')
+            spawn.memory.task = [`${Game.time}`]
         }
     }
 }

@@ -2,23 +2,13 @@ import { WrapLoop } from './util/errorMapper'
 import { CheckAndGeneratePixel } from './util/pixel'
 import './patch'
 import { HarvestController, Task } from './harvester'
-import { GetRequiredEnergy, LookForInRange, MoveCreep, SerializeRoomPos } from './util/util'
+import { LookForInRange, MoveCreep, SerializeRoomPos } from './util/util'
 import { obstacles } from './util/global'
-
-const body = [WORK, CARRY, MOVE]
+import { SpawnController } from './spawnTask'
 
 export const loop = WrapLoop(() => {
     const spawn = Game.spawns['Home']
-    if (!spawn.spawning && Object.keys(Game.creeps).length === 0) {
-        if (spawn.room.energyAvailable >= GetRequiredEnergy(body)) {
-            spawn.spawnCreep(body, `${spawn.name}-harvester-${Game.time}`, {
-                memory: {
-                    roomName: spawn.room.name,
-                    role: '',
-                }
-            })
-        }
-    }
+    SpawnController.work(spawn)
 
     for (const creepName in Game.creeps) {
         const creep = Game.creeps[creepName]
