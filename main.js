@@ -994,7 +994,7 @@ exports.Transferer = {
             body.unshift(CARRY);
             rest -= BODYPART_COST.carry;
         }
-        const count = Math.floor(rest / (BODYPART_COST.carry * 2 + BODYPART_COST.move));
+        const count = Math.min(1, Math.floor(rest / (BODYPART_COST.carry * 2 + BODYPART_COST.move)));
         for (let i = 0; i < count; i++) {
             body.push(CARRY, CARRY, MOVE);
         }
@@ -1118,7 +1118,7 @@ const __1 = __webpack_require__(/*! ../ */ "./src/index.ts");
 exports.Worker = {
     minEnergy: util_1.GetRequiredEnergy([MOVE, WORK, CARRY]),
     create(maxEnergy) {
-        const count = Math.floor(maxEnergy / (BODYPART_COST.work + BODYPART_COST.move + BODYPART_COST.carry));
+        const count = Math.min(2, Math.floor(maxEnergy / (BODYPART_COST.work + BODYPART_COST.move + BODYPART_COST.carry)));
         const body = [];
         for (let i = 0; i < count; i++) {
             body.push(MOVE, WORK, CARRY);
