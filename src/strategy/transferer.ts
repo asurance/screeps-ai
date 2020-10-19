@@ -25,7 +25,7 @@ export const Transferer: IStrategy = {
             body.unshift(CARRY)
             rest -= BODYPART_COST.carry
         }
-        const count = Math.floor(rest / (BODYPART_COST.carry * 2 + BODYPART_COST.move))
+        const count = Math.min(1, Math.floor(rest / (BODYPART_COST.carry * 2 + BODYPART_COST.move)))
         for (let i = 0; i < count; i++) {
             body.push(CARRY, CARRY, MOVE)
         }
