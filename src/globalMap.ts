@@ -21,7 +21,7 @@ export function Scan(): void {
             spawn.memory.roomName = spawn.room.name
         }
     }
-    for (const creepName in Game.spawns) {
+    for (const creepName in Game.creeps) {
         const creep = Game.creeps[creepName]
         if (creep.memory.roomName !== creep.room.name) {
             let list = SpawnMap.get(creep.memory.roomName)

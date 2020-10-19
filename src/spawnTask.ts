@@ -15,7 +15,7 @@ export const SpawnController = {
                     const harvsetTask = Memory.tasks[task.taskId]
                     const source = spawn.room.memory.sources.find(s => s.id === harvsetTask)!
                     if (source.creeps.length === 0) {
-                        spawn.spawnCreep(task.body, `${spawn}-${task.role}-${Game.time}`)
+                        spawn.spawnCreep(task.body, `${spawn.name}-${task.role}-${Game.time}`)
                     }
                 }
             }
