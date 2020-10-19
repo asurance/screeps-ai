@@ -7,7 +7,6 @@ import { UpdateControllerResult } from '../command/upgradeController'
 import { BuildResult } from '../command/build'
 import { RepairResult } from '../command/repair'
 import { creepInfo } from '../'
-import { Cache } from 'webpack'
 
 /**
  * 采集者数据
