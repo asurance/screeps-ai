@@ -6,6 +6,16 @@ interface Memory {
     }
 }
 
+interface SourceTask {
+    id: Id<Source>
+    creeps: string[]
+    containerPositon: number
+}
+
+interface RoomMemory {
+    sources: SourceTask[]
+}
+
 interface CreepMemory {
     roomName: string
     role: string
@@ -28,6 +38,6 @@ type Tail<T extends unknown[]> = T extends [unknown, ...argv: infer K] ? K : nev
 declare module NodeJS {
     interface Global {
         GenerateStats(): void
-        GenerateHarvester(): void
+        ScanRoom(): void
     }
 }

@@ -3,6 +3,7 @@ import { GetRequiredEnergy } from './util/util'
 export interface SpawnTask {
     body: BodyPartConstant[]
     role: string
+    taskId: string
 }
 
 export const SpawnController = {
@@ -11,19 +12,10 @@ export const SpawnController = {
             if (spawn.memory.task) {
                 const task = Memory.tasks[spawn.memory.task[0]] as SpawnTask
                 if (spawn.room.energyAvailable >= GetRequiredEnergy(task.body)) {
-                    const result = spawn.spawnCreep(task.body, `${spawn}-${task.role}-${Game.time}`, {
-                        memory: {
-                            roomName: spawn.room.name,
-                            role: '',
-                        }
-                    })
-                    if (result === OK) {
-                        delete Memory.tasks[spawn.memory.task[0]]
-                        if (spawn.memory.task.length === 1) {
-                            delete spawn.memory.task
-                        } else {
-                            spawn.memory.task.shift()
-                        }
+                    const harvsetTask = Memory.tasks[task.taskId]
+                    const source = spawn.room.memory.sources.find(s => s.id === harvsetTask)!
+                    if (source.creeps.length === 0) {
+                        spawn.spawnCreep(task.body, `${spawn}-${task.role}-${Game.time}`)
                     }
                 }
             }

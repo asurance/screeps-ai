@@ -2,11 +2,12 @@ import { WrapLoop } from './util/errorMapper'
 import { CheckAndGeneratePixel } from './util/pixel'
 import './patch'
 import { HarvestController, Task } from './harvester'
-import { LookForInRange, MoveCreep, SerializeRoomPos } from './util/util'
-import { obstacles } from './util/global'
-import { SpawnController } from './spawnTask'
+import { MoveCreep } from './util/util'
+import { SpawnController, SpawnTask } from './spawnTask'
+import { Scan } from './globalMap'
 
 export const loop = WrapLoop(() => {
+    Scan()
     const spawn = Game.spawns['Home']
     SpawnController.work(spawn)
 
@@ -15,17 +16,11 @@ export const loop = WrapLoop(() => {
         if (!creep.spawning) {
             if (!creep.memory.role) {
                 creep.memory.role = 'harvester'
-                const source = spawn.pos.findClosestByPath(FIND_SOURCES)!
-                const structure = LookForInRange('structure', source, 1)
-                    .filter(s => obstacles.has(s.structure.structureType))
-                const terrain = LookForInRange('terrain', source, 1)
-                    .filter(t => t.terrain !== 'wall'
-                        && structure.every(s => s.x !== t.x && s.y !== t.y))
-                const task: Task = {
-                    source: source.id,
-                    containerPosition: SerializeRoomPos(terrain[0]),
-                }
-                HarvestController.born(creep, task)
+                const taskIds = spawn.memory.task ?? []
+                const taskId = taskIds.shift()!
+                const task = Memory.tasks[taskId] as SpawnTask
+                taskIds.push(taskId)
+                HarvestController.born(creep, Memory.tasks[task.taskId] as Task)
             }
             if (creep.ticksToLive! <= 1) {
                 HarvestController.dead(creep)
