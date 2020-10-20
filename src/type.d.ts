@@ -45,5 +45,6 @@ declare module NodeJS {
     interface Global {
         GenerateStats(): void
         ScanRoom(): void
+        ClearMemory(): void
     }
 }

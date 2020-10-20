@@ -1,5 +1,8 @@
-for (const key in Memory) {
-    delete Memory[key as keyof Memory]
+global.ClearMemory = () => {
+    for (const key in Memory) {
+        delete Memory[key as keyof Memory]
+    }
+    Memory.tasks = {}
 }
 if (!Memory.tasks) {
     Memory.tasks = {}
