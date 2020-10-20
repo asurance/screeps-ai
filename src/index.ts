@@ -4,9 +4,10 @@ import { HarvestController } from './harvester'
 import { MoveCreep } from './util/util'
 import { SpawnController } from './spawnTask'
 import { Scan, SpawnMap } from './globalMap'
-import './clearMemory'
 import './patch'
 import { GetTask } from './patch/memoryPatch'
+
+console.log('Updated')
 
 export const loop = WrapLoop(() => {
 
