@@ -11,13 +11,13 @@ jobs:
 
       - name: Install
         uses: bahmutov/npm-install@master
-        
+
       - name: Build
         run: npm run build
 
       - name: Deploy
         run: npm run deploy
-        with:
+        env:
           DEPLOY_BRANCH: sim
           DEPLOY_EMAIL: ${{SCREEP_EMAIL}}
           DEPLOY_PASSWORD: ${{SCREEP_PASSWORD}}
