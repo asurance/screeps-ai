@@ -12,8 +12,14 @@ interface SourceTask {
     containerPositon: number
 }
 
+interface SpawnTask {
+    body: BodyPartConstant[]
+    role: string
+    taskId: Id<SourceTask>
+}
+
 interface RoomMemory {
-    sources: SourceTask[]
+    sourcess: SourceTask[]
 }
 
 interface CreepMemory {
@@ -27,7 +33,7 @@ interface CreepMemory {
 
 interface SpawnMemory {
     roomName: string
-    task?: string[]
+    task?: Id<SpawnTask>[]
 }
 
 /**

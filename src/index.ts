@@ -1,11 +1,12 @@
 import { WrapLoop } from './util/errorMapper'
 import { CheckAndGeneratePixel } from './util/pixel'
-import { HarvestController, Task } from './harvester'
+import { HarvestController } from './harvester'
 import { MoveCreep } from './util/util'
-import { SpawnController, SpawnTask } from './spawnTask'
+import { SpawnController } from './spawnTask'
 import { Scan } from './globalMap'
 import './clearMemory'
 import './patch'
+import { GetTask } from './patch/memoryPatch'
 
 export const loop = WrapLoop(() => {
     Scan()
@@ -21,10 +22,10 @@ export const loop = WrapLoop(() => {
             if (!creep.memory.role) {
                 const taskIds = spawn.memory.task ?? []
                 const taskId = taskIds.shift()!
-                const task = Memory.tasks[taskId] as SpawnTask
+                const task = GetTask(taskId)
                 taskIds.push(taskId)
                 spawn.memory.task = taskIds
-                HarvestController.born(creep, Memory.tasks[task.taskId] as Task)
+                HarvestController.born(creep, task.taskId)
                 creep.memory.role = 'harvester'
             }
             if (creep.ticksToLive! <= 1) {
