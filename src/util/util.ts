@@ -32,6 +32,12 @@ export function GetRequiredEnergy(body: BodyPartConstant[]): number {
     }, 0)
 }
 
+/**
+ * 在范围内查找
+ * @param type 查找类型
+ * @param obj 中心位置
+ * @param range 范围
+ */
 export function LookForInRange<T extends keyof AllLookAtTypes>(
     type: T,
     obj: RoomObject,
@@ -48,14 +54,29 @@ export function LookForInRange<T extends keyof AllLookAtTypes>(
     }
 }
 
+/**
+ * 序列化位置
+ * @param pos 
+ */
 export function SerializeRoomPos(pos: RoomPosition | { x: number, y: number }): number {
     return pos.x + pos.y * 50
 }
 
+/**
+ * 反序列化位置
+ * @param pos 
+ * @param roomName 
+ */
 export function DeserializeRoomPos(pos: number, roomName: string): RoomPosition {
     return new RoomPosition(pos % 50, Math.floor(pos / 50), roomName)
 }
 
+/**
+ * 设置creep移动目标
+ * @param creep creep
+ * @param pos 目标位置
+ * @param range 移动到的范围
+ */
 export function SetMoveTarget(creep: Creep, pos: RoomPosition | { x: number, y: number } | number, range: number): void {
     creep.memory.moving = {
         pos: typeof pos === 'number' ? pos : SerializeRoomPos(pos),
@@ -63,6 +84,10 @@ export function SetMoveTarget(creep: Creep, pos: RoomPosition | { x: number, y: 
     }
 }
 
+/**
+ * 移动creep
+ * @param creep Creep
+ */
 export function MoveCreep(creep: Creep): boolean {
     const target = DeserializeRoomPos(creep.memory.moving!.pos, creep.room.name)
     const range = creep.memory.moving!.range

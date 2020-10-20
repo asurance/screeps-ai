@@ -1,14 +1,8 @@
 /* eslint-disable @typescript-eslint/prefer-namespace-keyword */
-
-interface Memory {
-    tasks: {
-        [key: string]: unknown
-    }
-}
-
 interface SourceTask {
     id: Id<Source>
     creeps: string[]
+    maxNumber: number
     containerPositon: number
 }
 
@@ -34,6 +28,12 @@ interface CreepMemory {
 interface SpawnMemory {
     roomName: string
     task?: Id<SpawnTask>[]
+}
+
+interface Memory {
+    tasks: {
+        [key: string]: unknown
+    }
 }
 
 /**

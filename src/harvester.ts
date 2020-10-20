@@ -1,5 +1,5 @@
 import { GetTask } from './patch/memoryPatch'
-import { SetMoveTarget } from './util/util'
+import { SerializeRoomPos, SetMoveTarget } from './util/util'
 
 export type Task = Id<SourceTask>
 
@@ -21,29 +21,34 @@ export const HarvestController = {
     },
     work: (creep: Creep): void => {
         const memory = creep.memory as CreepMemory & HarvsetData
-        if (creep.store.energy > 0) {
-            let site = creep.pos.lookFor('constructionSite').filter(s => s.structureType === STRUCTURE_CONTAINER)[0]
-            if (site) {
-                creep.build(site)
-            } else {
-                const container = creep.pos.lookFor('structure').filter(s => s.structureType === STRUCTURE_CONTAINER)[0]
-                if (container) {
-                    if (container.hits < container.hitsMax) {
-                        creep.repair(container)
-                    } else {
-                        const source = Game.getObjectById(GetTask(memory.task).id)!
-                        creep.harvest(source)
-                    }
+        const task = GetTask(memory.task)
+        let needHarvest = true
+        if (task.containerPositon === SerializeRoomPos(creep.pos)) {
+            if (creep.store.energy > 0) {
+                let site = creep.pos.lookFor('constructionSite').filter(s => s.structureType === STRUCTURE_CONTAINER)[0]
+                if (site) {
+                    creep.build(site)
+                    needHarvest = false
                 } else {
-                    const result = creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER)
-                    if (result === OK) {
-                        site = creep.pos.lookFor('constructionSite').filter(s => s.structureType === STRUCTURE_CONTAINER)[0]
-                        creep.build(site)
+                    const container = creep.pos.lookFor('structure').filter(s => s.structureType === STRUCTURE_CONTAINER)[0]
+                    if (container) {
+                        if (container.hits < container.hitsMax) {
+                            creep.repair(container)
+                            needHarvest = false
+                        }
+                    } else {
+                        const result = creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER)
+                        if (result === OK) {
+                            site = creep.pos.lookFor('constructionSite').filter(s => s.structureType === STRUCTURE_CONTAINER)[0]
+                            creep.build(site)
+                            needHarvest = false
+                        }
                     }
                 }
             }
-        } else {
-            const source = Game.getObjectById(GetTask(memory.task).id)!
+        }
+        if (needHarvest) {
+            const source = Game.getObjectById(task.id)!
             creep.harvest(source)
         }
     },

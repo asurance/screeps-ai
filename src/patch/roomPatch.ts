@@ -7,7 +7,7 @@ global.ScanRoom = () => {
     for (const key in Game.rooms) {
         const room = Game.rooms[key]
         const sources = room.find(FIND_SOURCES)
-        const sourceTasks = sources.map(source => {
+        const sourceTasks: SourceTask[] = sources.map(source => {
             const structure = LookForInRange('structure', source, 1)
                 .filter(s => obstacles.has(s.structure.structureType))
             const terrain = LookForInRange('terrain', source, 1)
@@ -16,23 +16,24 @@ global.ScanRoom = () => {
             return {
                 id: source.id,
                 creeps: [],
-                containerPositon: SerializeRoomPos(terrain[0])
+                containerPositon: SerializeRoomPos(terrain[0]),
+                maxNumber: terrain.length,
             }
         })
         const spawnName = SpawnMap.get(room.name)![0]
         const spawn = Game.spawns[spawnName]
         const tasks = spawn.memory.task ?? []
         sourceTasks.forEach((source, i) => {
-            const harvsetTaskName = `${room.name}-source-${i}` as Id<SourceTask>
-            SetTask(harvsetTaskName, source)
-            const task: SpawnTask = {
+            const sourceTaskName = `SourceTask:${room.name}-${i}` as Id<SourceTask>
+            SetTask(sourceTaskName, source)
+            const spawnTask: SpawnTask = {
                 body: [WORK, CARRY, MOVE],
                 role: 'harvester',
-                taskId: harvsetTaskName,
+                taskId: sourceTaskName,
             }
-            const taskName = `${Game.time}-${task.role}-${i}` as Id<SpawnTask>
-            SetTask(taskName, task)
-            tasks.push(taskName)
+            const spawnTaskName = `SpawnTask:${Game.time}-${spawnTask.role}-${i}` as Id<SpawnTask>
+            SetTask(spawnTaskName, spawnTask)
+            tasks.push(spawnTaskName)
         })
         spawn.memory.task = tasks
     }
