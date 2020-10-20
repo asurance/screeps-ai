@@ -19,6 +19,6 @@ jobs:
         run: npm run deploy
         env:
           DEPLOY_BRANCH: sim
-          DEPLOY_EMAIL: ${{SCREEP_EMAIL}}
-          DEPLOY_PASSWORD: ${{SCREEP_PASSWORD}}
+          DEPLOY_EMAIL: ${{secrets.SCREEP_EMAIL}}
+          DEPLOY_PASSWORD: ${{secrets.SCREEP_PASSWORD}}
           DEPLOY_PTR: false
