@@ -1,0 +1,24 @@
+on:
+  push:
+    branches:
+      - feature/**
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Install
+        uses: bahmutov/npm-install@master
+        
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        run: npm run deploy
+        with:
+          DEPLOY_BRANCH: sim
+          DEPLOY_EMAIL: ${{SCREEP_EMAIL}}
+          DEPLOY_PASSWORD: ${{SCREEP_PASSWORD}}
+          DEPLOY_PTR: false

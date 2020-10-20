@@ -1,13 +1,10 @@
 module.exports = function (grunt) {
 
-    // Pull defaults (including username and password) from .screeps.json
-    var config = require('./screeps.json')
-
     // Allow grunt options to override default configuration
-    var branch = grunt.option('branch') || config.branch;
-    var email = grunt.option('email') || config.email;
-    var password = grunt.option('password') || config.password;
-    var ptr = grunt.option('ptr') ? true : config.ptr
+    var branch = grunt.option('branch') || process.env.DEPLOY_BRANCH;
+    var email = grunt.option('email') || process.env.DEPLOY_EMAIL;
+    var password = grunt.option('password') || process.env.DEPLOY_PASSWORD;
+    var ptr = grunt.option('ptr') ? true : process.env.DEPLOY_PTR
 
     // Load needed tasks
     grunt.loadNpmTasks('grunt-screeps')
