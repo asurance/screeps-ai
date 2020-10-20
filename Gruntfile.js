@@ -4,7 +4,7 @@ module.exports = function (grunt) {
     var branch = grunt.option('branch') || process.env.DEPLOY_BRANCH;
     var email = grunt.option('email') || process.env.DEPLOY_EMAIL;
     var password = grunt.option('password') || process.env.DEPLOY_PASSWORD;
-    var ptr = grunt.option('ptr') ? true : process.env.DEPLOY_PTR
+    var ptr = grunt.option('ptr') ? true : process.env.DEPLOY_PTR === 'true'
 
     // Load needed tasks
     grunt.loadNpmTasks('grunt-screeps')
