@@ -1,3 +1,6 @@
+for (const key in Memory) {
+    delete Memory[key as keyof Memory]
+}
 if (!Memory.tasks) {
     Memory.tasks = {}
 }
