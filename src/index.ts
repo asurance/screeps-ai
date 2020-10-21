@@ -7,7 +7,7 @@ import { Scan, SpawnMap } from './globalMap'
 import './patch'
 import { GetTask } from './patch/memoryPatch'
 
-console.log('Updated')
+console.log('Index update')
 
 export const loop = WrapLoop(() => {
 

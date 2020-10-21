@@ -1,12 +1,8 @@
-global.ClearMemory = () => {
-    for (const key in Memory) {
-        delete Memory[key as keyof Memory]
-    }
-    Memory.tasks = {}
+for (const key in Memory) {
+    delete Memory[key as keyof Memory]
 }
-if (!Memory.tasks) {
-    Memory.tasks = {}
-}
+Memory.tasks = {}
+console.log('Memory patch')
 
 export function GetTask<T>(taskId: Id<T>): T {
     return Memory.tasks[taskId] as T

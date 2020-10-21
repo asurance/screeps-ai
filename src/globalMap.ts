@@ -1,6 +1,23 @@
 export const SpawnMap = new Map<string, string[]>()
 export const CreepMap = new Map<string, string[]>()
 
+Object.defineProperties(global, {
+    SpawnMap: {
+        get: () => {
+            SpawnMap.forEach((spawns, room) => {
+                console.log(room, JSON.stringify(spawns))
+            })
+        }
+    },
+    CreepMap: {
+        get: () => {
+            CreepMap.forEach((spawns, room) => {
+                console.log(room, JSON.stringify(spawns))
+            })
+        }
+    },
+})
+
 export function Scan(): void {
     for (const spawnName in Game.spawns) {
         const spawn = Game.spawns[spawnName]
