@@ -24,18 +24,18 @@ export function Scan(): void {
     for (const creepName in Game.creeps) {
         const creep = Game.creeps[creepName]
         if (creep.memory.roomName !== creep.room.name) {
-            let list = SpawnMap.get(creep.memory.roomName)
+            let list = CreepMap.get(creep.memory.roomName)
             if (list) {
                 const index = list.indexOf(creep.name)
                 if (index >= 0) {
                     list.splice(index, 1)
                 }
             }
-            list = SpawnMap.get(creep.room.name)
+            list = CreepMap.get(creep.room.name)
             if (list) {
                 list.push(creep.name)
             } else {
-                SpawnMap.set(creep.room.name, [creep.name])
+                CreepMap.set(creep.room.name, [creep.name])
             }
             creep.memory.roomName = creep.room.name
         }
