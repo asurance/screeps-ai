@@ -1,4 +1,4 @@
-import { GetTask } from './patch/memoryPatch'
+import { GetTask } from './globalTask'
 import { SerializeRoomPos, SetMoveTarget } from './util/util'
 
 export type Task = Id<SourceTask>

@@ -102,3 +102,10 @@ export function MoveCreep(creep: Creep): boolean {
         return false
     }
 }
+
+
+export function DefineGlobalCmd(name: string, cmd: () => unknown): void {
+    Object.defineProperty(global, name, {
+        get: cmd
+    })
+}

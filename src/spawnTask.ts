@@ -1,4 +1,4 @@
-import { GetTask } from './patch/memoryPatch'
+import { GetTask } from './globalTask'
 import { GetRequiredEnergy } from './util/util'
 
 export const SpawnController = {

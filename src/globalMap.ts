@@ -1,21 +1,17 @@
+import { DefineGlobalCmd } from './util/util'
+
 export const SpawnMap = new Map<string, string[]>()
 export const CreepMap = new Map<string, string[]>()
 
-Object.defineProperties(global, {
-    SpawnMap: {
-        get: () => {
-            SpawnMap.forEach((spawns, room) => {
-                console.log(room, JSON.stringify(spawns))
-            })
-        }
-    },
-    CreepMap: {
-        get: () => {
-            CreepMap.forEach((spawns, room) => {
-                console.log(room, JSON.stringify(spawns))
-            })
-        }
-    },
+DefineGlobalCmd('SpawnMap', () => {
+    SpawnMap.forEach((spawns, room) => {
+        console.log(room, JSON.stringify(spawns))
+    })
+})
+DefineGlobalCmd('CreepMap', () => {
+    CreepMap.forEach((spawns, room) => {
+        console.log(room, JSON.stringify(spawns))
+    })
 })
 
 export function Scan(): void {

@@ -1,7 +1,7 @@
 import { SpawnMap } from '../globalMap'
 import { obstacles } from '../util/global'
 import { LookForInRange, SerializeRoomPos } from '../util/util'
-import { SetTask } from './memoryPatch'
+import { SetTask } from '../globalTask'
 
 global.ScanRoom = () => {
     for (const key in Game.rooms) {

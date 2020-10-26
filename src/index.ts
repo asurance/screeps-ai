@@ -4,10 +4,8 @@ import { HarvestController } from './harvester'
 import { MoveCreep } from './util/util'
 import { SpawnController } from './spawnTask'
 import { Scan, SpawnMap } from './globalMap'
+import { GetTask } from './globalTask'
 import './patch'
-import { GetTask } from './patch/memoryPatch'
-
-console.log('Index update')
 
 export const loop = WrapLoop(() => {
 
