@@ -225,7 +225,7 @@ const fns = [FindUpgradeTarget, FindBuildTarget, FindRepairTarget]
 
 function FindNextWork(creep: Creep): boolean {
     const counts = [0, 0, 0]
-    const rest = []
+    const indice = [0, 1, 2]
     const workers = creepInfo.get(Strategy.Worker)
     if (workers) {
         cmds.forEach((cmd, index) => {
@@ -239,25 +239,12 @@ function FindNextWork(creep: Creep): boolean {
     if (index >= 0) {
         counts[index]--
     }
-    for (let i = 0; i < counts.length; i++) {
-        if (counts[i] === 0) {
-            const result = fns[i](creep)
-            if (result) {
-                return true
-            }
-        } else {
-            rest.push(i)
-        }
-    }
-    let id = RandomObjectInList(rest)
-    while (id !== null) {
-        const result = fns[id](creep)
+    indice.sort((a, b) => counts[a] - counts[b])
+    for (let i = 0; i < indice.length; i++) {
+        const result = fns[indice[i]](creep)
         if (result) {
             return true
         }
-        const index = rest.indexOf(id)
-        rest.splice(index, 1)
-        id = RandomObjectInList(rest)
     }
     return false
 }
