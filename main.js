@@ -664,7 +664,13 @@ function CreateCreepInfo() {
     }
     return creepInfo;
 }
+let isReset = true;
 function loop() {
+    if (isReset) {
+        console.log('Reset');
+        Game.notify('Reset', 3600);
+        isReset = false;
+    }
     const spawn = Game.spawns['Home'];
     // 回收多余cpu资源
     if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
@@ -1319,7 +1325,7 @@ const cmds = ["updateController" /* UpgradeController */, "build" /* Build */, "
 const fns = [FindUpgradeTarget, FindBuildTarget, FindRepairTarget];
 function FindNextWork(creep) {
     const counts = [0, 0, 0];
-    const rest = [];
+    const indice = [0, 1, 2];
     const workers = __1.creepInfo.get("worker" /* Worker */);
     if (workers) {
         cmds.forEach((cmd, index) => {
@@ -1333,26 +1339,12 @@ function FindNextWork(creep) {
     if (index >= 0) {
         counts[index]--;
     }
-    for (let i = 0; i < counts.length; i++) {
-        if (counts[i] === 0) {
-            const result = fns[i](creep);
-            if (result) {
-                return true;
-            }
-        }
-        else {
-            rest.push(i);
-        }
-    }
-    let id = util_1.RandomObjectInList(rest);
-    while (id !== null) {
-        const result = fns[id](creep);
+    indice.sort((a, b) => counts[a] - counts[b]);
+    for (let i = 0; i < indice.length; i++) {
+        const result = fns[indice[i]](creep);
         if (result) {
             return true;
         }
-        const index = rest.indexOf(id);
-        rest.splice(index, 1);
-        id = util_1.RandomObjectInList(rest);
     }
     return false;
 }
