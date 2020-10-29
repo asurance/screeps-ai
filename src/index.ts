@@ -41,8 +41,14 @@ function CreateCreepInfo(): Map<Strategy, Map<Command | null, Creep[]>> {
     return creepInfo
 }
 
-export function loop(): void {
+let isReset = true
 
+export function loop(): void {
+    if (isReset) {
+        console.log('Reset')
+        Game.notify('Reset', 3600)
+        isReset = false
+    }
     const spawn = Game.spawns['Home']
 
     // 回收多余cpu资源
