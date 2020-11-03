@@ -44,10 +44,9 @@ export const HarvestController = {
             creep.harvest(source)
         }
     },
-    dead: (creep: Creep): void => {
-        const memory = creep.memory as CreepMemory & HarvsetData
+    onDead: (m: CreepMemory): void => {
+        const memory = m as CreepMemory & HarvsetData
         const source = GetTask(memory.task)
         source.creep = ''
-        creep.drop(RESOURCE_ENERGY)
     }
 }
