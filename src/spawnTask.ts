@@ -9,7 +9,14 @@ export const SpawnController = {
                 if (spawn.room.energyAvailable >= GetRequiredEnergy(task.body)) {
                     const sourceTask = GetTask(task.taskId)
                     if (sourceTask.creeps.length === 0) {
-                        spawn.spawnCreep(task.body, `${spawn.name}-${task.role}-${Game.time}`)
+                        spawn.spawnCreep(task.body, `${spawn.name}-${task.role}-${Game.time}`,
+                            {
+                                memory: {
+                                    role: 'harveseter',
+                                    roomName: spawn.room.name,
+                                    state: CreepState.born,
+                                }
+                            })
                     }
                 }
             }

@@ -20,7 +20,7 @@ interface RoomStats {
 }
 
 export function GlobalPatch(): void {
-    global.ScanRoom = () => {
+    DefineGlobalCmd('scan', () => {
         for (const key in Game.rooms) {
             const room = Game.rooms[key]
             const sources = room.find(FIND_SOURCES)
@@ -54,9 +54,8 @@ export function GlobalPatch(): void {
             })
             spawn.memory.task = tasks
         }
-    }
-
-    global.GenerateStats = () => {
+    })
+    DefineGlobalCmd('stats', () => {
         const stats: Stats = {
             gcl: Math.floor(Game.gcl.progress / Game.gcl.progressTotal * 100),
             gclLevel: Game.gcl.level,
@@ -78,7 +77,7 @@ export function GlobalPatch(): void {
                 console.log(JSON.stringify(roomStats, undefined, 4))
             }
         }
-    }
+    })
     DefineGlobalCmd('SpawnMap', () => {
         SpawnMap.forEach((spawns, room) => {
             console.log(room, JSON.stringify(spawns))

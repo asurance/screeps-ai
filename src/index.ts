@@ -3,9 +3,30 @@ import { CheckAndGeneratePixel } from './util/pixel'
 import { HarvestController } from './harvester'
 import { MoveCreep } from './util/util'
 import { SpawnController } from './spawnTask'
-import { Scan, SpawnMap } from './globalMap'
-import { GetTask } from './globalTask'
 import { Patch } from './patch'
+import { OnCreepDead, Scan } from './globalMap'
+
+export let isReset = true
+
+const controllerMap: { [key: string]: typeof HarvestController } = {
+    harvester: HarvestController
+}
+
+const creepStateMap: { [key in CreepState]: (creep: Creep) => void } = {
+    [CreepState.born]: (creep) => {
+        const controller = controllerMap[creep.memory.role]
+        controller.born(creep)
+        creep.memory.state = CreepState.work
+    },
+    [CreepState.work]: (creep) => {
+        const controller = controllerMap[creep.memory.role]
+        if (creep.ticksToLive! <= 1) {
+            controller.dead(creep)
+        } else {
+            controller.work(creep)
+        }
+    },
+}
 
 export const loop = WrapLoop(() => {
 
@@ -19,19 +40,14 @@ export const loop = WrapLoop(() => {
     }
     for (const creepName in Game.creeps) {
         const creep = Game.creeps[creepName]
+        creep.room.controller!.upgradeBlocked
         if (!creep.spawning) {
             if (!creep.memory.role) {
-                const spawn = Game.spawns[SpawnMap.get(creep.room.name)![0]]
-                const spawnTasks = spawn.memory.task!
-                const sourceTaskId = spawnTasks.shift()!
-                const sourceTask = GetTask(sourceTaskId)
-                spawnTasks.push(sourceTaskId)
-                spawn.memory.task = spawnTasks
-                HarvestController.born(creep, sourceTask.taskId)
                 creep.memory.role = 'harvester'
+                controllerMap[creep.memory.role].born(creep)
             }
             if (creep.ticksToLive! <= 1) {
-                HarvestController.dead(creep)
+                controllerMap[creep.memory.role].dead(creep)
                 delete Memory.creeps[creep.name]
             } else {
                 let finishMove = true
@@ -42,11 +58,23 @@ export const loop = WrapLoop(() => {
                     }
                 }
                 if (finishMove) {
-                    HarvestController.work(creep)
+                    controllerMap[creep.memory.role].work(creep)
                 }
             }
         }
     }
 
+    if (Game.time % 10 === 0) {
+        for (const creepName in Memory.creeps) {
+            if (!(creepName in Game.creeps)) {
+                const creepInfo = Memory.creeps[creepName]
+                OnCreepDead(creepName, creepInfo.roomName)
+                delete Memory.creeps[creepName]
+            }
+        }
+    }
+
     CheckAndGeneratePixel()
+
+    isReset = false
 })

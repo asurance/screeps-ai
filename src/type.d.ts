@@ -13,12 +13,17 @@ interface SpawnTask {
 }
 
 interface RoomMemory {
-    sourcess: SourceTask[]
+    sources: Id<SourceTask>[]
 }
 
+const enum CreepState {
+    born,
+    work,
+}
 interface CreepMemory {
     roomName: string
     role: string
+    state: CreepState
     moving?: {
         pos: number
         range: number

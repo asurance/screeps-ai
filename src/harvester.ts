@@ -8,15 +8,18 @@ export interface HarvsetData {
 }
 
 export const HarvestController = {
-    born: (creep: Creep, task: Task): void => {
+    born: (creep: Creep): void => {
+        const sourceTask = creep.room.memory.sources.find(s => GetTask(s).creeps.length > 0)
         const memory = creep.memory as CreepMemory & HarvsetData
-        memory.task = task
-        const source = GetTask(task)
-        source.creeps.push(creep.name)
-        if (source.creeps.length === 1) {
-            SetMoveTarget(creep, source.containerPositon, 0)
-        } else {
-            SetMoveTarget(creep, Game.getObjectById(source.id)!.pos, 1)
+        if (sourceTask) {
+            memory.task = sourceTask
+            const source = GetTask(sourceTask)
+            source.creeps.push(creep.name)
+            if (source.creeps.length === 1) {
+                SetMoveTarget(creep, source.containerPositon, 0)
+            } else {
+                SetMoveTarget(creep, Game.getObjectById(source.id)!.pos, 1)
+            }
         }
     },
     work: (creep: Creep): void => {
