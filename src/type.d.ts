@@ -1,19 +1,15 @@
 /* eslint-disable @typescript-eslint/prefer-namespace-keyword */
 interface SourceTask {
     id: Id<Source>
-    creeps: string[]
-    maxNumber: number
+    creep: string
     containerPositon: number
-}
-
-interface SpawnTask {
-    body: BodyPartConstant[]
-    role: string
-    taskId: Id<SourceTask>
 }
 
 interface RoomMemory {
     sources: Id<SourceTask>[]
+    requireRole: {
+        [role: string]: number
+    }
 }
 
 const enum CreepState {
@@ -32,10 +28,10 @@ interface CreepMemory {
 
 interface SpawnMemory {
     roomName: string
-    task?: Id<SpawnTask>[]
 }
 
 interface Memory {
+    play: boolean
     tasks: {
         [key: string]: unknown
     }
@@ -45,11 +41,3 @@ interface Memory {
  * 去掉tuple类型第一个参数
  */
 type Tail<T extends unknown[]> = T extends [unknown, ...argv: infer K] ? K : never
-
-declare module NodeJS {
-    interface Global {
-        GenerateStats(): void
-        ScanRoom(): void
-        ClearMemory(): void
-    }
-}

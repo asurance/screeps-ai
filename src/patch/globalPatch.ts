@@ -32,27 +32,18 @@ export function GlobalPatch(): void {
                         && structure.every(s => s.x !== t.x && s.y !== t.y))
                 return {
                     id: source.id,
-                    creeps: [],
+                    creep: '',
                     containerPositon: SerializeRoomPos(terrain[0]),
-                    maxNumber: terrain.length,
                 }
             })
-            const spawnName = SpawnMap.get(room.name)![0]
-            const spawn = Game.spawns[spawnName]
-            const tasks = spawn.memory.task ?? []
-            sourceTasks.forEach((source, i) => {
-                const sourceTaskName = `SourceTask:${room.name}-${i}` as Id<SourceTask>
-                SetTask(sourceTaskName, source)
-                const spawnTask: SpawnTask = {
-                    body: [WORK, CARRY, MOVE],
-                    role: 'harvester',
-                    taskId: sourceTaskName,
-                }
-                const spawnTaskName = `SpawnTask:${Game.time}-${spawnTask.role}-${i}` as Id<SpawnTask>
-                SetTask(spawnTaskName, spawnTask)
-                tasks.push(spawnTaskName)
+            room.memory.sources = sourceTasks.map((s, i) => {
+                const taskId = `Source: ${room}-${i}` as Id<SourceTask>
+                SetTask(taskId, s)
+                return taskId
             })
-            spawn.memory.task = tasks
+            room.memory.requireRole = {
+                harvester: sourceTasks.length
+            }
         }
     })
     DefineGlobalCmd('stats', () => {
