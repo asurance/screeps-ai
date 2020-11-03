@@ -47,7 +47,7 @@ export const loop = WrapLoop(() => {
         SpawnController.work(spawn)
     }
 
-    const creepNameSet = new Set(Object.keys(Game.creeps))
+    const creepNameSet = new Set(Object.keys(Memory.creeps))
     for (const creepName in Game.creeps) {
         const creep = Game.creeps[creepName]
         if (!creep.spawning) {
