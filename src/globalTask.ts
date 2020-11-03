@@ -1,10 +1,10 @@
+if (!Memory.tasks) {
+    Memory.tasks = {}
+}
+
 export function GetTask<T>(taskId: Id<T>): T {
-    if (Memory.tasks) {
-        if (taskId in Memory.tasks) {
-            return Memory.tasks[taskId] as T
-        } else {
-            throw new Error(`Lack task info of ${taskId}`)
-        }
+    if (taskId in Memory.tasks) {
+        return Memory.tasks[taskId] as T
     } else {
         throw new Error(`Lack task info of ${taskId}`)
     }
