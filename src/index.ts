@@ -1,14 +1,10 @@
 import { WrapLoop } from './util/errorMapper'
 import { CheckAndGeneratePixel } from './util/pixel'
-import { HarvestController } from './harvester'
 import { MoveCreep } from './util/util'
 import { SpawnController } from './spawnTask'
 import { Patch } from './patch'
 import { OnCreepDead, Scan } from './globalMap'
-
-const controllerMap: { [key: string]: typeof HarvestController } = {
-    harvester: HarvestController
-}
+import { controllerMap } from './controllerMap'
 
 const creepStateMap: { [key in CreepState]: (creep: Creep) => void } = {
     [CreepState.born]: (creep) => {
