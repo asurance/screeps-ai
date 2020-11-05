@@ -37,7 +37,7 @@ export function GlobalPatch(): void {
                 }
             })
             room.memory.sources = sourceTasks.map((s, i) => {
-                const taskId = `Source: ${room}-${i}` as Id<SourceTask>
+                const taskId = `Source: ${room.name}-${i}` as Id<SourceTask>
                 SetTask(taskId, s)
                 return taskId
             })
