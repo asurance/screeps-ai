@@ -1,9 +1,8 @@
 import { GlobalPatch } from './globalPatch'
 
-let isReset = true
 export function Patch(): void {
-    if (isReset) {
+    if (!global.patched) {
         GlobalPatch()
-        isReset = false
+        global.patched = true
     }
 }

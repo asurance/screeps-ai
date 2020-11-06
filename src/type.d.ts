@@ -43,3 +43,9 @@ interface Memory {
  * 去掉tuple类型第一个参数
  */
 type Tail<T extends unknown[]> = T extends [unknown, ...argv: infer K] ? K : never
+
+declare module NodeJS {
+    interface Global {
+        patched?: boolean
+    }
+}
