@@ -1,16 +1,13 @@
 import { controllerMap } from './controllerMap'
+import { GetTask } from './globalTask'
 
 export const SpawnController = {
     work: (spawn: StructureSpawn): void => {
         if (!spawn.spawning) {
-            let role = ''
-            for (const key in spawn.room.memory.requireRole) {
-                if (spawn.room.memory.requireRole[key] > 0) {
-                    role = key
-                    break
-                }
-            }
-            if (role) {
+            const tasks = spawn.room.memory.spawnTask
+            let spawnTask: Id<SpawnTask> | null = null
+            for (const task of tasks) {
+                const role = GetTask(task).role
                 const bodyparts = controllerMap[role].spawn(spawn)
                 if (bodyparts.length > 0) {
                     const result = spawn.spawnCreep(bodyparts, `${spawn.name}-${role}-${Game.time}`, {
@@ -21,9 +18,13 @@ export const SpawnController = {
                         }
                     })
                     if (result === OK) {
-                        spawn.room.memory.requireRole[role]--
+                        spawnTask = task
+                        break
                     }
                 }
+            }
+            if (spawnTask) {
+                _.pull(tasks, spawnTask)
             }
         }
     }

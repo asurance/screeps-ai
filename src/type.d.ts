@@ -5,11 +5,13 @@ interface SourceTask {
     containerPositon: number
 }
 
+interface SpawnTask {
+    role: string
+}
+
 interface RoomMemory {
     sources: Id<SourceTask>[]
-    requireRole: {
-        [role: string]: number
-    }
+    spawnTask: Id<SpawnTask>[]
 }
 
 const enum CreepState {

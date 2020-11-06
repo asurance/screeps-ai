@@ -1,4 +1,4 @@
-import { GetTask } from './globalTask'
+import { GetTask, SetTask } from './globalTask'
 import { GetRequiredEnergy, SetMoveTarget } from './util/util'
 
 export type Task = Id<SourceTask>
@@ -7,16 +7,22 @@ export interface HarvsetData {
     task: Task
 }
 
-const singleCost = GetRequiredEnergy([WORK, CARRY, MOVE])
+const minCost = GetRequiredEnergy([WORK, CARRY, MOVE])
+const stepCost = GetRequiredEnergy([WORK, WORK, MOVE])
 
 export const HarvestController = {
     spawn: (spawn: StructureSpawn): BodyPartConstant[] => {
-        const count = Math.min(6, Math.floor(spawn.room.energyAvailable / singleCost))
-        const out: BodyPartConstant[] = []
-        for (let i = 0; i < count; i++) {
-            out.push(WORK, CARRY, MOVE)
+        if (spawn.room.energyAvailable >= minCost) {
+            const out = [WORK, CARRY, MOVE]
+            const rest = spawn.room.energyAvailable - minCost
+            const count = Math.min(2, Math.floor(rest / stepCost))
+            for (let i = 0; i < count; i++) {
+                out.push(WORK, WORK, MOVE)
+            }
+            return out
+        } else {
+            return []
         }
-        return out
     },
     born: (creep: Creep): void => {
         const sourceTask = creep.room.memory.sources.find(s => !(GetTask(s).creep))
@@ -57,9 +63,10 @@ export const HarvestController = {
     onDead: (m: CreepMemory): void => {
         const memory = m as CreepMemory & HarvsetData
         const roomMemory = Memory.rooms[memory.roomName]
-        if (roomMemory) {
-            roomMemory.requireRole.harvester++
-        }
+        const index = _.findIndex(roomMemory.sources, v => v === memory.task)
+        const taskId = `Spawn: ${m.roomName}-harvester-${index}` as Id<SpawnTask>
+        SetTask(taskId, { role: 'harvester' })
+        roomMemory.spawnTask.push(taskId)
         const source = GetTask(memory.task)
         source.creep = ''
     }

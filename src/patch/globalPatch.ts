@@ -25,25 +25,25 @@ export function GlobalPatch(): void {
             const room = Game.rooms[key]
             const sources = room.find(FIND_SOURCES)
             const sourceTasks: SourceTask[] = sources.map(source => {
-                const structure = LookForInRange('structure', source, 1)
-                    .filter(s => obstacles.has(s.structure.structureType))
-                const terrain = LookForInRange('terrain', source, 1)
-                    .filter(t => t.terrain !== 'wall'
-                        && structure.every(s => s.x !== t.x && s.y !== t.y))
+                const structure = _.filter(LookForInRange('structure', source, 1), s => obstacles.has(s.structure.structureType))
+                const terrain = _.filter(LookForInRange('terrain', source, 1), t => t.terrain !== 'wall'
+                    && structure.every(s => s.x !== t.x && s.y !== t.y))
                 return {
                     id: source.id,
                     creep: '',
                     containerPositon: SerializeRoomPos(terrain[0]),
                 }
             })
-            room.memory.sources = sourceTasks.map((s, i) => {
+            room.memory.sources = _.map(sourceTasks, (s, i) => {
                 const taskId = `Source: ${room.name}-${i}` as Id<SourceTask>
                 SetTask(taskId, s)
                 return taskId
             })
-            room.memory.requireRole = {
-                harvester: sourceTasks.length
-            }
+            room.memory.spawnTask = _.map(sourceTasks, (s, i) => {
+                const taskId = `Spawn: ${room.name}-harvester-${i}` as Id<SpawnTask>
+                SetTask(taskId, { role: 'harvester' })
+                return taskId
+            })
         }
     })
     DefineGlobalCmd('stats', () => {
