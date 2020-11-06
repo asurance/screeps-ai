@@ -1,5 +1,5 @@
 import { controllerMap } from './controllerMap'
-import { GetTask } from './globalTask'
+import { ClearTask, GetTask } from './globalTask'
 
 export const SpawnController = {
     work: (spawn: StructureSpawn): void => {
@@ -25,6 +25,7 @@ export const SpawnController = {
             }
             if (spawnTask) {
                 _.pull(tasks, spawnTask)
+                ClearTask(spawnTask)
             }
         }
     }
