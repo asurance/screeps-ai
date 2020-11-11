@@ -98,7 +98,6 @@ module.exports =
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Build = exports.SetCreepBuild = void 0;
-const config_1 = __webpack_require__(/*! ../config */ "./src/config.ts");
 /**
  * 建造前
  * @param creep Creep
@@ -120,18 +119,12 @@ function Build(creep) {
         if (creep.store.energy > 0) {
             if (target.progress < target.progressTotal) {
                 if (creep.pos.inRangeTo(target, 3)) {
-                    const result = creep.build(target);
-                    if (result !== OK) {
-                        Game.notify(`withdraw fail with code:${result}`, config_1.config.notifyInterval);
-                    }
+                    creep.build(target);
                     return 0 /* OK */;
                 }
                 else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 3 });
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config_1.config.notifyInterval);
-                        }
+                        creep.moveTo(target, { range: 3 });
                     }
                     return 1 /* Moving */;
                 }
@@ -213,7 +206,6 @@ exports.SetNextCommand = SetNextCommand;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Harvest = exports.SetCreepHarvest = void 0;
-const config_1 = __webpack_require__(/*! ../config */ "./src/config.ts");
 /**
  * 收获前
  * @param creep Creep
@@ -236,19 +228,13 @@ function Harvest(creep) {
         if (target.energy > 0 || target.ticksToRegeneration < 100) {
             if (creep.pos.inRangeTo(target.pos, 1)) {
                 if (target.energy > 0) {
-                    const result = creep.harvest(target);
-                    if (result !== OK) {
-                        Game.notify(`harvest fail with code:${result}`, config_1.config.notifyInterval);
-                    }
+                    creep.harvest(target);
                 }
                 return 0 /* OK */;
             }
             else {
                 if (creep.fatigue <= 0) {
-                    const result = creep.moveTo(target, { range: 1 });
-                    if (result !== OK) {
-                        Game.notify(`move fail with code:${result}`, config_1.config.notifyInterval);
-                    }
+                    creep.moveTo(target, { range: 1 });
                 }
                 return 1 /* Moving */;
             }
@@ -277,7 +263,6 @@ exports.Harvest = Harvest;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Pickup = exports.SetCreepPickup = void 0;
-const config_1 = __webpack_require__(/*! ../config */ "./src/config.ts");
 function SetCreepPickup(creep, target) {
     const command = creep.memory.cmd;
     command.target = target.id;
@@ -294,18 +279,12 @@ function Pickup(creep) {
         if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
             if (target.amount > 0) {
                 if (creep.pos.inRangeTo(target, 1)) {
-                    const result = creep.pickup(target);
-                    if (result !== OK) {
-                        Game.notify(`pickup fail with code:${result}`, config_1.config.notifyInterval);
-                    }
+                    creep.pickup(target);
                     return 0 /* OK */;
                 }
                 else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 1 });
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config_1.config.notifyInterval);
-                        }
+                        creep.moveTo(target, { range: 1 });
                     }
                     return 1 /* Moving */;
                 }
@@ -338,7 +317,6 @@ exports.Pickup = Pickup;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Repair = exports.SetCreepRepair = void 0;
-const config_1 = __webpack_require__(/*! ../config */ "./src/config.ts");
 /**
  * 维修前
  * @param creep Creep
@@ -360,18 +338,12 @@ function Repair(creep) {
         if (creep.store.energy > 0) {
             if (target.hits < target.hitsMax) {
                 if (creep.pos.inRangeTo(target, 3)) {
-                    const result = creep.repair(target);
-                    if (result !== OK) {
-                        Game.notify(`withdraw fail with code:${result}`, config_1.config.notifyInterval);
-                    }
+                    creep.repair(target);
                     return 0 /* OK */;
                 }
                 else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 3 });
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config_1.config.notifyInterval);
-                        }
+                        creep.moveTo(target, { range: 3 });
                     }
                     return 1 /* Moving */;
                 }
@@ -404,7 +376,6 @@ exports.Repair = Repair;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Transfer = exports.SetCreepTransfer = void 0;
-const config_1 = __webpack_require__(/*! ../config */ "./src/config.ts");
 /**
  * 转移前
  * @param creep Creep
@@ -438,18 +409,12 @@ function Transfer(creep) {
             }
             if (hasRest) {
                 if (creep.pos.inRangeTo(target, 1)) {
-                    const result = creep.transfer(target, RESOURCE_ENERGY);
-                    if (result !== OK) {
-                        Game.notify(`transfer fail with code:${result}`, config_1.config.notifyInterval);
-                    }
+                    creep.transfer(target, RESOURCE_ENERGY);
                     return 0 /* OK */;
                 }
                 else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 1 });
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config_1.config.notifyInterval);
-                        }
+                        creep.moveTo(target, { range: 1 });
                     }
                     return 1 /* Moving */;
                 }
@@ -482,7 +447,6 @@ exports.Transfer = Transfer;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateController = exports.SetCreepUpgradeController = void 0;
-const config_1 = __webpack_require__(/*! ../config */ "./src/config.ts");
 /**
  * 升级控制器前
  * @param creep Creep
@@ -494,18 +458,12 @@ exports.SetCreepUpgradeController = SetCreepUpgradeController;
 function UpdateController(creep) {
     if (creep.store.energy > 0) {
         if (creep.pos.inRangeTo(creep.room.controller, 3)) {
-            const result = creep.upgradeController(creep.room.controller);
-            if (result !== OK) {
-                Game.notify(`upgradeController fail with code:${result}`, config_1.config.notifyInterval);
-            }
+            creep.upgradeController(creep.room.controller);
             return 0 /* OK */;
         }
         else {
             if (creep.fatigue <= 0) {
-                const result = creep.moveTo(creep.room.controller, { range: 3 });
-                if (result !== OK) {
-                    Game.notify(`move fail with code:${result}`, config_1.config.notifyInterval);
-                }
+                creep.moveTo(creep.room.controller, { range: 3 });
             }
             return 1 /* Moving */;
         }
@@ -530,7 +488,6 @@ exports.UpdateController = UpdateController;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Withdraw = exports.SetCreepWithdraw = void 0;
-const config_1 = __webpack_require__(/*! ../config */ "./src/config.ts");
 /**
  * 取回前
  * @param creep Creep
@@ -552,18 +509,12 @@ function Withdraw(creep) {
         if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
             if (target.store.energy > 0) {
                 if (creep.pos.inRangeTo(target, 1)) {
-                    const result = creep.withdraw(target, RESOURCE_ENERGY);
-                    if (result !== OK) {
-                        Game.notify(`withdraw fail with code:${result}`, config_1.config.notifyInterval);
-                    }
+                    creep.withdraw(target, RESOURCE_ENERGY);
                     return 0 /* OK */;
                 }
                 else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 1 });
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config_1.config.notifyInterval);
-                        }
+                        creep.moveTo(target, { range: 1 });
                     }
                     return 1 /* Moving */;
                 }
@@ -613,6 +564,102 @@ exports.config = Memory.config ? Object.assign(Object.assign({}, defualtConfig),
 
 /***/ }),
 
+/***/ "./src/deal.ts":
+/*!*********************!*\
+  !*** ./src/deal.ts ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PopTree = exports.PushTree = exports.deal = void 0;
+function deal() {
+    for (const roomName in Game.rooms) {
+        const room = Game.rooms[roomName];
+        if (room.terminal && room.terminal.store.energy > 0) {
+            const orderTree = [];
+            Game.market.getAllOrders({
+                type: ORDER_BUY,
+                resourceType: RESOURCE_ENERGY,
+            }).forEach(order => {
+                const amount = Math.min(room.terminal.store.energy, order.remainingAmount);
+                const price = amount > 0 ? order.price * amount / (amount + Game.market.calcTransactionCost(amount, order.roomName, room.name)) : 0;
+                const orderInfo = {
+                    id: order.id,
+                    price,
+                    amount,
+                };
+                PushTree(orderTree, orderInfo);
+            });
+            let count = 0;
+            let o = PopTree(orderTree);
+            let rest = room.terminal.store.energy;
+            while (count < 10 && o) {
+                if (rest > 0) {
+                    const sell = Math.min(rest, o.amount);
+                    Game.market.deal(o.id, sell, room.name);
+                    rest -= sell;
+                }
+                else {
+                    break;
+                }
+                count++;
+                o = PopTree(orderTree);
+            }
+        }
+    }
+}
+exports.deal = deal;
+function PushTree(tree, node) {
+    let target = tree.length;
+    while (target > 0) {
+        const parent = Math.floor((target - 1) / 2);
+        if (tree[parent].price < node.price) {
+            target = parent;
+        }
+        else {
+            break;
+        }
+    }
+    tree[target] = node;
+}
+exports.PushTree = PushTree;
+function PopTree(tree) {
+    if (tree.length > 0) {
+        if (tree.length === 1) {
+            return tree.pop();
+        }
+        else {
+            const max = tree[0];
+            const last = tree.pop();
+            let target = 0;
+            while (target * 2 + 1 < tree.length) {
+                let child = target * 2 + 1;
+                if (tree[child + 1].price > tree[child].price) {
+                    child++;
+                }
+                if (tree[child].price > last.price) {
+                    target = child;
+                }
+                else {
+                    break;
+                }
+            }
+            tree[target] = last;
+            return max;
+        }
+    }
+    else {
+        return null;
+    }
+}
+exports.PopTree = PopTree;
+
+
+/***/ }),
+
 /***/ "./src/index.ts":
 /*!**********************!*\
   !*** ./src/index.ts ***!
@@ -638,6 +685,7 @@ const worker_1 = __webpack_require__(/*! ./strategy/worker */ "./src/strategy/wo
 const withdraw_1 = __webpack_require__(/*! ./command/withdraw */ "./src/command/withdraw.ts");
 const build_1 = __webpack_require__(/*! ./command/build */ "./src/command/build.ts");
 const repair_1 = __webpack_require__(/*! ./command/repair */ "./src/command/repair.ts");
+const deal_1 = __webpack_require__(/*! ./deal */ "./src/deal.ts");
 /**
  * creep信息
  */
@@ -672,10 +720,6 @@ function loop() {
         isReset = false;
     }
     const spawn = Game.spawns['Home'];
-    // 回收多余cpu资源
-    if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
-        Game.cpu.generatePixel();
-    }
     // 删除过期数据
     for (const key in Memory.creeps) {
         if (!(key in Game.creeps)) {
@@ -782,10 +826,15 @@ function loop() {
                 };
                 strategyMap[spawing].initStrategy(creep);
             }
-            else {
-                Game.notify(`spawn creep fail with code:${result}`, config_1.config.notifyInterval);
-            }
         }
+    }
+    // 回收多余能量
+    if (Game.time % 10000 === 0) {
+        deal_1.deal();
+    }
+    // 回收多余cpu资源
+    if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
+        Game.cpu.generatePixel();
     }
 }
 exports.loop = loop;
@@ -1084,6 +1133,8 @@ function FindTransferTarget(creep) {
                 case STRUCTURE_STORAGE:
                     return structure.my && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
                 case STRUCTURE_CONTAINER:
+                    return structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                case STRUCTURE_TERMINAL:
                     return structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
             }
             return false;
