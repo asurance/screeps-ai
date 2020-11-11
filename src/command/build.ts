@@ -61,17 +61,11 @@ export function Build(creep: Creep): BuildResult {
         if (creep.store.energy > 0) {
             if (target.progress < target.progressTotal) {
                 if (creep.pos.inRangeTo(target, 3)) {
-                    const result = creep.build(target)
-                    if (result !== OK) {
-                        Game.notify(`withdraw fail with code:${result}`, config.notifyInterval)
-                    }
+                    creep.build(target)
                     return BuildResult.OK
                 } else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 3 })
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config.notifyInterval)
-                        }
+                        creep.moveTo(target, { range: 3 })
                     }
                     return BuildResult.Moving
                 }

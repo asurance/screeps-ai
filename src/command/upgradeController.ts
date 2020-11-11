@@ -29,17 +29,11 @@ export function SetCreepUpgradeController(): void {
 export function UpdateController(creep: Creep): UpdateControllerResult {
     if (creep.store.energy > 0) {
         if (creep.pos.inRangeTo(creep.room.controller!, 3)) {
-            const result = creep.upgradeController(creep.room.controller!)
-            if (result !== OK) {
-                Game.notify(`upgradeController fail with code:${result}`, config.notifyInterval)
-            }
+            creep.upgradeController(creep.room.controller!)
             return UpdateControllerResult.OK
         } else {
             if (creep.fatigue <= 0) {
-                const result = creep.moveTo(creep.room.controller!, { range: 3 })
-                if (result !== OK) {
-                    Game.notify(`move fail with code:${result}`, config.notifyInterval)
-                }
+                creep.moveTo(creep.room.controller!, { range: 3 })
             }
             return UpdateControllerResult.Moving
         }

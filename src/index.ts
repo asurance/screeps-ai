@@ -14,6 +14,7 @@ import { Worker } from './strategy/worker'
 import { Withdraw } from './command/withdraw'
 import { Build } from './command/build'
 import { Repair } from './command/repair'
+import { deal } from './deal'
 
 /**
  * creep信息
@@ -50,11 +51,6 @@ export function loop(): void {
         isReset = false
     }
     const spawn = Game.spawns['Home']
-
-    // 回收多余cpu资源
-    if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
-        Game.cpu.generatePixel()
-    }
 
     // 删除过期数据
     for (const key in Memory.creeps) {
@@ -161,9 +157,17 @@ export function loop(): void {
                     type: spawing
                 }
                 strategyMap[spawing].initStrategy(creep)
-            } else {
-                Game.notify(`spawn creep fail with code:${result}`, config.notifyInterval)
             }
         }
+    }
+
+    // 回收多余能量
+    if (Game.time % 10000 === 0) {
+        deal()
+    }
+
+    // 回收多余cpu资源
+    if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
+        Game.cpu.generatePixel()
     }
 }

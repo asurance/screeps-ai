@@ -73,17 +73,11 @@ export function Transfer(creep: Creep): TransferResult {
             }
             if (hasRest) {
                 if (creep.pos.inRangeTo(target, 1)) {
-                    const result = creep.transfer(target, RESOURCE_ENERGY)
-                    if (result !== OK) {
-                        Game.notify(`transfer fail with code:${result}`, config.notifyInterval)
-                    }
+                    creep.transfer(target, RESOURCE_ENERGY)
                     return TransferResult.OK
                 } else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 1 })
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config.notifyInterval)
-                        }
+                        creep.moveTo(target, { range: 1 })
                     }
                     return TransferResult.Moving
                 }

@@ -58,18 +58,12 @@ export function Harvest(creep: Creep): HarvestResult {
         if (target.energy > 0 || target.ticksToRegeneration < 100) {
             if (creep.pos.inRangeTo(target.pos, 1)) {
                 if (target.energy > 0) {
-                    const result = creep.harvest(target)
-                    if (result !== OK) {
-                        Game.notify(`harvest fail with code:${result}`, config.notifyInterval)
-                    }
+                    creep.harvest(target)
                 }
                 return HarvestResult.OK
             } else {
                 if (creep.fatigue <= 0) {
-                    const result = creep.moveTo(target, { range: 1 })
-                    if (result !== OK) {
-                        Game.notify(`move fail with code:${result}`, config.notifyInterval)
-                    }
+                    creep.moveTo(target, { range: 1 })
                 }
                 return HarvestResult.Moving
             }

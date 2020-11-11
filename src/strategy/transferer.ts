@@ -111,6 +111,8 @@ function FindTransferTarget(creep: Creep): boolean {
                     return structure.my && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                 case STRUCTURE_CONTAINER:
                     return structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
+                case STRUCTURE_TERMINAL:
+                    return structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
             }
             return false
         }),

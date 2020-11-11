@@ -61,17 +61,11 @@ export function Repair(creep: Creep): RepairResult {
         if (creep.store.energy > 0) {
             if (target.hits < target.hitsMax) {
                 if (creep.pos.inRangeTo(target, 3)) {
-                    const result = creep.repair(target)
-                    if (result !== OK) {
-                        Game.notify(`withdraw fail with code:${result}`, config.notifyInterval)
-                    }
+                    creep.repair(target)
                     return RepairResult.OK
                 } else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 3 })
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config.notifyInterval)
-                        }
+                        creep.moveTo(target, { range: 3 })
                     }
                     return RepairResult.Moving
                 }

@@ -56,17 +56,11 @@ export function Pickup(creep: Creep): PickupResult {
         if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
             if (target.amount > 0) {
                 if (creep.pos.inRangeTo(target, 1)) {
-                    const result = creep.pickup(target)
-                    if (result !== OK) {
-                        Game.notify(`pickup fail with code:${result}`, config.notifyInterval)
-                    }
+                    creep.pickup(target)
                     return PickupResult.OK
                 } else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 1 })
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config.notifyInterval)
-                        }
+                        creep.moveTo(target, { range: 1 })
                     }
                     return PickupResult.Moving
                 }

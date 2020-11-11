@@ -61,17 +61,11 @@ export function Withdraw(creep: Creep): WithdrawResult {
         if (creep.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
             if (target.store.energy > 0) {
                 if (creep.pos.inRangeTo(target, 1)) {
-                    const result = creep.withdraw(target, RESOURCE_ENERGY)
-                    if (result !== OK) {
-                        Game.notify(`withdraw fail with code:${result}`, config.notifyInterval)
-                    }
+                    creep.withdraw(target, RESOURCE_ENERGY)
                     return WithdrawResult.OK
                 } else {
                     if (creep.fatigue <= 0) {
-                        const result = creep.moveTo(target, { range: 1 })
-                        if (result !== OK) {
-                            Game.notify(`move fail with code:${result}`, config.notifyInterval)
-                        }
+                        creep.moveTo(target, { range: 1 })
                     }
                     return WithdrawResult.Moving
                 }
