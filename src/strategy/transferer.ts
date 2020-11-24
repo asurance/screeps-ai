@@ -110,14 +110,13 @@ function FindTransferTarget(creep: Creep): boolean {
                 case STRUCTURE_STORAGE:
                     return structure.my && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                 case STRUCTURE_CONTAINER:
-                    return structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                 case STRUCTURE_TERMINAL:
                     return structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0
             }
             return false
         }),
         range: 1,
-    }) as (StructureContainer | StructureExtension | StructureSpawn | StructureTower | StructureStorage | null)
+    }) as (StructureContainer | StructureExtension | StructureSpawn | StructureTower | StructureStorage | StructureTerminal | null)
     if (target) {
         SetNextCommand(Command.Transfer, creep, target)
         return true

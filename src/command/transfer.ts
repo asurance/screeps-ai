@@ -1,5 +1,3 @@
-import { config } from '../config'
-
 /**
  * 转移数据
  */
@@ -11,7 +9,7 @@ interface TransferData extends CommandData {
     /**
      * 转移的目标
      */
-    target: Id<StructureContainer | StructureExtension | StructureSpawn | StructureTower | StructureStorage>
+    target: Id<StructureContainer | StructureExtension | StructureSpawn | StructureTower | StructureStorage | StructureTerminal>
 }
 
 /**
@@ -45,7 +43,7 @@ export const enum TransferResult {
  * @param creep Creep
  * @param target 转移目标
  */
-export function SetCreepTransfer(creep: Creep, target: StructureContainer | StructureSpawn | StructureExtension | StructureTower | StructureStorage): void {
+export function SetCreepTransfer(creep: Creep, target: StructureContainer | StructureSpawn | StructureExtension | StructureTower | StructureStorage | StructureTerminal): void {
     const command = creep.memory.cmd as TransferData
     command.target = target.id
 }
@@ -68,6 +66,7 @@ export function Transfer(creep: Creep): TransferResult {
                     break
                 case STRUCTURE_CONTAINER:
                 case STRUCTURE_STORAGE:
+                case STRUCTURE_TERMINAL:
                     hasRest = target.store.getFreeCapacity(RESOURCE_ENERGY) > 0
                     break
             }
