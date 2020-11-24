@@ -404,6 +404,7 @@ function Transfer(creep) {
                     break;
                 case STRUCTURE_CONTAINER:
                 case STRUCTURE_STORAGE:
+                case STRUCTURE_TERMINAL:
                     hasRest = target.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
                     break;
             }
@@ -617,6 +618,7 @@ function PushTree(tree, node) {
     while (target > 0) {
         const parent = Math.floor((target - 1) / 2);
         if (tree[parent].price < node.price) {
+            tree[target] = tree[parent];
             target = parent;
         }
         else {
@@ -637,7 +639,7 @@ function PopTree(tree) {
             let target = 0;
             while (target * 2 + 1 < tree.length) {
                 let child = target * 2 + 1;
-                if (tree[child + 1].price > tree[child].price) {
+                if (child + 1 < tree.length && tree[child + 1].price > tree[child].price) {
                     child++;
                 }
                 if (tree[child].price > last.price) {
@@ -1133,7 +1135,6 @@ function FindTransferTarget(creep) {
                 case STRUCTURE_STORAGE:
                     return structure.my && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
                 case STRUCTURE_CONTAINER:
-                    return structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
                 case STRUCTURE_TERMINAL:
                     return structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
             }
