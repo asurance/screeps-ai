@@ -619,11 +619,11 @@ function PushTree(tree, node) {
         const parent = Math.floor((target - 1) / 2);
         if (tree[parent].price < node.price) {
             tree[target] = tree[parent];
-            target = parent;
         }
         else {
             break;
         }
+        target = parent;
     }
     tree[target] = node;
 }
@@ -643,11 +643,12 @@ function PopTree(tree) {
                     child++;
                 }
                 if (tree[child].price > last.price) {
-                    target = child;
+                    tree[target] = tree[child];
                 }
                 else {
                     break;
                 }
+                target = child;
             }
             tree[target] = last;
             return max;
