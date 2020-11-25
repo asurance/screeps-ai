@@ -46,10 +46,10 @@ export function PushTree<T extends { price: number }>(tree: T[], node: T): void 
         const parent = Math.floor((target - 1) / 2)
         if (tree[parent].price < node.price) {
             tree[target] = tree[parent]
-            target = parent
         } else {
             break
         }
+        target = parent
     }
     tree[target] = node
 }
@@ -67,10 +67,11 @@ export function PopTree<T extends { price: number }>(tree: T[]): T | null {
                     child++
                 }
                 if (tree[child].price > last.price) {
-                    target = child
+                    tree[target] = tree[child]
                 } else {
                     break
                 }
+                target = child
             }
             tree[target] = last
             return max
