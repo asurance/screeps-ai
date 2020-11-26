@@ -162,8 +162,11 @@ export function loop(): void {
     }
 
     // 回收多余能量
-    if (Game.time % 10000 === 0) {
-        deal()
+    for (const roomName in Game.rooms) {
+        const room = Game.rooms[roomName]
+        if (room.terminal && room.terminal.store.energy > room.terminal.store.getFreeCapacity(RESOURCE_ENERGY)) {
+            deal(room)
+        }
     }
 
     // 回收多余cpu资源

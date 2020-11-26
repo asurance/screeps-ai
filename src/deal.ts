@@ -4,39 +4,35 @@ interface OrderInfo {
     amount: number
 }
 
-export function deal(): void {
-    for (const roomName in Game.rooms) {
-        const room = Game.rooms[roomName]
-        if (room.terminal && room.terminal.store.energy > 0) {
-            const orderTree: OrderInfo[] = []
-            Game.market.getAllOrders({
-                type: ORDER_BUY,
-                resourceType: RESOURCE_ENERGY,
-            }).forEach(order => {
-                const amount = Math.min(room.terminal!.store.energy, order.remainingAmount)
-                const price = amount > 0 ? order.price * amount / (amount + Game.market.calcTransactionCost(amount, order.roomName!, room.name)) : 0
-                const orderInfo: OrderInfo = {
-                    id: order.id,
-                    price,
-                    amount,
-                }
-                PushTree(orderTree, orderInfo)
-            })
-            let count = 0
-            let o = PopTree(orderTree)
-            let rest = room.terminal.store.energy
-            while (count < 10 && o) {
-                if (rest > 0) {
-                    const sell = Math.min(rest, o.amount)
-                    Game.market.deal(o.id, sell, room.name)
-                    rest -= sell
-                } else {
-                    break
-                }
-                count++
-                o = PopTree(orderTree)
-            }
+export function deal(room: Room): void {
+    const orderTree: OrderInfo[] = []
+    Game.market.getAllOrders({
+        type: ORDER_BUY,
+        resourceType: RESOURCE_ENERGY,
+    }).forEach(order => {
+        const amount = Math.min(room.terminal!.store.energy, order.amount)
+        const price = amount > 0 ? order.price * amount / (amount + Game.market.calcTransactionCost(amount, order.roomName!, room.name)) : 0
+        const orderInfo: OrderInfo = {
+            id: order.id,
+            price,
+            amount,
         }
+        PushTree(orderTree, orderInfo)
+    })
+    let count = 0
+    let o = PopTree(orderTree)
+    let rest = room.terminal!.store.energy
+    while (count < 10 && o) {
+        if (rest > 0) {
+            const sell = Math.min(rest, o.amount)
+            Game.market.deal(o.id, sell, room.name)
+            Game.notify(`deal ${o.id} with amount ${sell}`)
+            rest -= sell
+        } else {
+            break
+        }
+        count++
+        o = PopTree(orderTree)
     }
 }
 
