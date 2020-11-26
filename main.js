@@ -576,40 +576,36 @@ exports.config = Memory.config ? Object.assign(Object.assign({}, defualtConfig),
 
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PopTree = exports.PushTree = exports.deal = void 0;
-function deal() {
-    for (const roomName in Game.rooms) {
-        const room = Game.rooms[roomName];
-        if (room.terminal && room.terminal.store.energy > 0) {
-            const orderTree = [];
-            Game.market.getAllOrders({
-                type: ORDER_BUY,
-                resourceType: RESOURCE_ENERGY,
-            }).forEach(order => {
-                const amount = Math.min(room.terminal.store.energy, order.remainingAmount);
-                const price = amount > 0 ? order.price * amount / (amount + Game.market.calcTransactionCost(amount, order.roomName, room.name)) : 0;
-                const orderInfo = {
-                    id: order.id,
-                    price,
-                    amount,
-                };
-                PushTree(orderTree, orderInfo);
-            });
-            let count = 0;
-            let o = PopTree(orderTree);
-            let rest = room.terminal.store.energy;
-            while (count < 10 && o) {
-                if (rest > 0) {
-                    const sell = Math.min(rest, o.amount);
-                    Game.market.deal(o.id, sell, room.name);
-                    rest -= sell;
-                }
-                else {
-                    break;
-                }
-                count++;
-                o = PopTree(orderTree);
-            }
+function deal(room) {
+    const orderTree = [];
+    Game.market.getAllOrders({
+        type: ORDER_BUY,
+        resourceType: RESOURCE_ENERGY,
+    }).forEach(order => {
+        const amount = Math.min(room.terminal.store.energy, order.amount);
+        const price = amount > 0 ? order.price * amount / (amount + Game.market.calcTransactionCost(amount, order.roomName, room.name)) : 0;
+        const orderInfo = {
+            id: order.id,
+            price,
+            amount,
+        };
+        PushTree(orderTree, orderInfo);
+    });
+    let count = 0;
+    let o = PopTree(orderTree);
+    let rest = room.terminal.store.energy;
+    while (count < 10 && o) {
+        if (rest > 0) {
+            const sell = Math.min(rest, o.amount);
+            Game.market.deal(o.id, sell, room.name);
+            Game.notify(`deal ${o.id} with amount ${sell}`);
+            rest -= sell;
         }
+        else {
+            break;
+        }
+        count++;
+        o = PopTree(orderTree);
     }
 }
 exports.deal = deal;
@@ -832,8 +828,11 @@ function loop() {
         }
     }
     // 回收多余能量
-    if (Game.time % 10000 === 0) {
-        deal_1.deal();
+    for (const roomName in Game.rooms) {
+        const room = Game.rooms[roomName];
+        if (room.terminal && room.terminal.store.energy > room.terminal.store.getFreeCapacity(RESOURCE_ENERGY)) {
+            deal_1.deal(room);
+        }
     }
     // 回收多余cpu资源
     if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
