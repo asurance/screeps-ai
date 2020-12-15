@@ -659,8 +659,12 @@ let isReset = true;
 function loop() {
     if (isReset) {
         console.log('Reset');
-        Game.notify('Reset', 3600);
         isReset = false;
+    }
+    // 回收多余cpu资源
+    if (Game.cpu.bucket >= PIXEL_CPU_COST) {
+        Game.cpu.generatePixel();
+        return;
     }
     const spawn = Game.spawns['Home'];
     // 删除过期数据
@@ -777,10 +781,6 @@ function loop() {
         if (room.terminal && room.terminal.store.energy > room.terminal.store.getFreeCapacity(RESOURCE_ENERGY)) {
             deal_1.deal(room);
         }
-    }
-    // 回收多余cpu资源
-    if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
-        Game.cpu.generatePixel();
     }
 }
 exports.loop = loop;
