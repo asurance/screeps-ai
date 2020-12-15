@@ -45,10 +45,16 @@ function CreateCreepInfo(): Map<Strategy, Map<Command | null, Creep[]>> {
 let isReset = true
 
 export function loop(): void {
+
     if (isReset) {
         console.log('Reset')
-        Game.notify('Reset', 3600)
         isReset = false
+    }
+    
+    // 回收多余cpu资源
+    if (Game.cpu.bucket >= PIXEL_CPU_COST) {
+        Game.cpu.generatePixel()
+        return
     }
     const spawn = Game.spawns['Home']
 
@@ -167,10 +173,5 @@ export function loop(): void {
         if (room.terminal && room.terminal.store.energy > room.terminal.store.getFreeCapacity(RESOURCE_ENERGY)) {
             deal(room)
         }
-    }
-
-    // 回收多余cpu资源
-    if (Game.cpu.bucket >= PIXEL_CPU_COST + 1000) {
-        Game.cpu.generatePixel()
     }
 }
